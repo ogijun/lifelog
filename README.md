@@ -1,24 +1,30 @@
-# README
+# lifelog
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+本・映画・料理・場所を同一のデータモデルで記録し、体験どうしの相互参照を辿る個人用ライフログ。
 
-Things you may want to cover:
+設計とその理由は [DESIGN.md](DESIGN.md)。
 
-* Ruby version
+## 動かす
 
-* System dependencies
+```sh
+bin/setup            # bundle install + db:prepare
+bin/rails db:seed    # 連鎖の実例が入る (任意)
+bin/rails server
+```
 
-* Configuration
+## 構成
 
-* Database creation
+| 場所 | 役割 |
+| --- | --- |
+| `db/migrate/` | `subjects` / `events` の2テーブルと `current_state` ビュー |
+| `app/models/subject.rb` `event.rb` | 記録の対象と、追記のみの遷移イベント |
+| `app/models/current_state.rb` | ビューの読み取り専用モデル。「最新イベントが現在の状態」 |
+| `app/models/recorder.rb` `timeline.rb` `wishlist.rb` | 状態を持たないクエリ層 |
+| `app/controllers/{books,films,dishes,places}_controller.rb` | 種類ごとの入力。**意図的なコピー**、統合しない |
 
-* Database initialization
+## テスト
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```sh
+bin/rails test
+bin/rubocop
+```
