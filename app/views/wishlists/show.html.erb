@@ -1,0 +1,28 @@
+<% content_for :title, "今日の候補" %>
+
+<h2>今日の候補</h2>
+<p class="lead">
+  <code>wished</code> のうち、その日のシードでシャッフルした数件。並びは今日のうちは変わらず、明日には入れ替わる。
+</p>
+
+<p class="filters">
+  <%= link_to "すべて", wishlist_path, class: ("on" if @kind.nil?) %>
+  <% Subject::KINDS.each do |kind| %>
+    <%= link_to kind_label(kind), wishlist_path(kind: kind), class: ("on" if @kind == kind) %>
+  <% end %>
+</p>
+
+<ol class="timeline">
+  <% @suggestions.each do |row| %>
+    <li class="event">
+      <span class="kind kind-<%= row.kind %>"><%= kind_label(row.kind) %></span>
+      <%= link_to row.title, subject_path(row.id) %>
+      <% if row.creator.present? %><span class="creator"><%= row.creator %></span><% end %>
+      <span class="as-of"><%= distance_of_time_in_words(row.as_of, Date.current) %> 前から</span>
+    </li>
+  <% end %>
+</ol>
+
+<% if @suggestions.empty? %>
+  <p class="empty">したいことが溜まっていない。</p>
+<% end %>

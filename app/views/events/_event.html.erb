@@ -1,0 +1,12 @@
+<li class="event" id="<%= dom_id(event) %>">
+  <time datetime="<%= event.occurred_on.iso8601 %>"><%= l event.occurred_on, format: :long %></time>
+  <span class="kind kind-<%= event.subject.kind %>"><%= kind_label(event.subject.kind) %></span>
+  <%= link_to event.subject.title, event.subject %>
+  <span class="type type-<%= event.type %>"><%= type_label(event.type) %></span>
+  <%= rating_stars(event.rating) %>
+  <% if event.subject.creator.present? %><span class="creator"><%= event.subject.creator %></span><% end %>
+  <% if event.cause %>
+    <span class="cause">← <%= link_to event.cause.subject.title, event.cause.subject %> から</span>
+  <% end %>
+  <% if event.note.present? %><p class="note"><%= event.note %></p><% end %>
+</li>

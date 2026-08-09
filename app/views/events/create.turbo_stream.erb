@@ -1,0 +1,11 @@
+<%= turbo_stream.prepend "events" do %>
+  <%= render "events/event", event: @event %>
+<% end %>
+
+<%= turbo_stream.update "state" do %>
+  <p class="state">
+    いまの状態:
+    <span class="type type-<%= @state.status %>"><%= type_label(@state.status) %></span>
+    <span class="as-of">(<%= l @state.as_of, format: :long %> 時点)</span>
+  </p>
+<% end %>

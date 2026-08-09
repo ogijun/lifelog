@@ -1,0 +1,6 @@
+<% messages = Array(records).compact.flat_map { |r| r.errors.full_messages } %>
+<% if messages.any? %>
+  <ul class="errors">
+    <% messages.each do |message| %><li><%= message %></li><% end %>
+  </ul>
+<% end %>

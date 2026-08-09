@@ -1,0 +1,43 @@
+<% content_for :title, @subject.title %>
+
+<h2>
+  <span class="kind kind-<%= @subject.kind %>"><%= kind_label(@subject.kind) %></span>
+  <%= @subject.title %>
+</h2>
+<% if @subject.creator.present? %><p class="creator"><%= @subject.creator %></p><% end %>
+
+<%= turbo_frame_tag "state" do %>
+  <p class="state">
+    いまの状態:
+    <% if @state %>
+      <span class="type type-<%= @state.status %>"><%= type_label(@state.status) %></span>
+      <span class="as-of">(<%= l @state.as_of, format: :long %> 時点)</span>
+    <% else %>
+      <span class="type">まだ何もない</span>
+    <% end %>
+  </p>
+<% end %>
+
+<h3>追記する</h3>
+<%= form_with url: subject_events_path(@subject), scope: nil, class: "record" do %>
+  <%= render "shared/errors", records: [ @event ] %>
+  <label>種別<%= select_tag "event[type]", options_for_select(Event::TYPES.map { |t| [ type_label(t), t ] }, @event.type) %></label>
+  <label>日付<%= date_field_tag "event[occurred_on]", @event.occurred_on, required: true %></label>
+  <label>評価<%= select_tag "event[rating]", options_for_select((1..5).map { |n| [ "★" * n, n ] }, @event.rating), include_blank: "—" %></label>
+  <label>メモ<%= text_area_tag "event[note]", @event.note, rows: 2 %></label>
+  <%= submit_tag "追記する" %>
+<% end %>
+
+<h3>これまで</h3>
+<ol class="timeline" id="events">
+  <%= render partial: "events/event", collection: @events %>
+</ol>
+
+<% if @subject.external_ids.any? %>
+  <h3>外部 ID</h3>
+  <dl class="external-ids">
+    <% @subject.external_ids.each do |key, value| %>
+      <dt><%= key %></dt><dd><%= value %></dd>
+    <% end %>
+  </dl>
+<% end %>

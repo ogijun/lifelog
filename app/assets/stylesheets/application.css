@@ -1,10 +1,108 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
- */
+:root {
+  --fg: #1c1b19;
+  --muted: #6b6862;
+  --bg: #faf8f4;
+  --line: #e0dcd3;
+  --accent: #7a4a2b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #ece8e1;
+    --muted: #9a958c;
+    --bg: #1a1917;
+    --line: #35322d;
+    --accent: #d8a97f;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 1rem 4rem;
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.7 ui-sans-serif, "Hiragino Sans", system-ui, sans-serif;
+}
+
+header, main { max-width: 46rem; margin: 0 auto; }
+
+header {
+  padding: 1.5rem 0 1rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1.5rem;
+}
+
+header h1 { font-size: 1.1rem; margin: 0 0 .5rem; letter-spacing: .06em; }
+header h1 a { color: var(--fg); text-decoration: none; }
+
+nav { display: flex; flex-wrap: wrap; gap: .9rem; font-size: .85rem; }
+nav .sep { color: var(--muted); border-left: 1px solid var(--line); padding-left: .9rem; }
+
+a { color: var(--accent); }
+
+h2 { font-size: 1.3rem; font-weight: 600; }
+h3 { font-size: .95rem; color: var(--muted); margin-top: 2rem; }
+
+.lead, .empty, .creator, .as-of, .cause, .note { color: var(--muted); }
+.lead, .empty { font-size: .85rem; }
+
+.filters { display: flex; gap: .8rem; font-size: .85rem; }
+.filters a { text-decoration: none; }
+.filters a.on { color: var(--fg); font-weight: 600; text-decoration: underline; }
+
+.timeline { list-style: none; padding: 0; margin: 1.5rem 0; }
+
+.event {
+  padding: .7rem 0;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .5rem;
+}
+
+.event time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .8rem; min-width: 8.5rem; }
+.event .note { flex-basis: 100%; margin: .2rem 0 0; font-size: .85rem; }
+
+.kind, .type {
+  font-size: .72rem;
+  padding: .1rem .45rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+
+.type-did { border-color: var(--accent); color: var(--accent); }
+.type-dropped { opacity: .55; }
+
+.rating { color: var(--accent); letter-spacing: .05em; }
+.creator, .cause, .as-of { font-size: .8rem; }
+
+.record { display: flex; flex-direction: column; gap: .6rem; max-width: 30rem; }
+.record fieldset { border: 1px solid var(--line); padding: 1rem; display: flex; flex-direction: column; gap: .6rem; }
+.record legend { font-size: .8rem; color: var(--muted); padding: 0 .4rem; }
+.record label { display: flex; flex-direction: column; gap: .2rem; font-size: .8rem; color: var(--muted); }
+
+input, select, textarea {
+  font: inherit;
+  padding: .4rem .5rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+input[type="submit"] {
+  align-self: flex-start;
+  cursor: pointer;
+  padding: .5rem 1.4rem;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.errors { color: #b3261e; font-size: .85rem; padding-left: 1.2rem; }
+
+.external-ids { display: grid; grid-template-columns: max-content 1fr; gap: .2rem 1rem; font-size: .85rem; }
+.external-ids dt { color: var(--muted); }
+.external-ids dd { margin: 0; }

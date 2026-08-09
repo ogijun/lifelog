@@ -1,0 +1,26 @@
+<%# 本のフォーム。films / dishes / places のコピー。統合しないこと (DESIGN.md)。 %>
+<% content_for :title, "本を記録する" %>
+
+<h2>本を記録する</h2>
+
+<%= form_with url: books_path, scope: nil, class: "record" do |f| %>
+  <%= render "shared/errors", records: [ @subject, @event ] %>
+
+  <fieldset>
+    <legend>本</legend>
+    <label>タイトル<%= text_field_tag "subject[title]", @subject.title, required: true, autofocus: true %></label>
+    <label>著者<%= text_field_tag "subject[creator]", @subject.creator %></label>
+    <label>ISBN<%= text_field_tag "subject[isbn]", @subject.external_ids["isbn"] %></label>
+  </fieldset>
+
+  <fieldset>
+    <legend>できごと</legend>
+    <label>種別<%= select_tag "event[type]", options_for_select(Event::TYPES.map { |t| [ type_label(t), t ] }, @event.type) %></label>
+    <label>日付<%= date_field_tag "event[occurred_on]", @event.occurred_on, required: true %></label>
+    <label>評価<%= select_tag "event[rating]", options_for_select((1..5).map { |n| [ "★" * n, n ] }, @event.rating), include_blank: "—" %></label>
+    <label>きっかけ<%= select_tag "event[caused_by]", options_for_select(@causes.map { |e| [ "#{e.occurred_on} #{e.subject.title} (#{type_label(e.type)})", e.id ] }, @event.caused_by), include_blank: "—" %></label>
+    <label>メモ<%= text_area_tag "event[note]", @event.note, rows: 3 %></label>
+  </fieldset>
+
+  <%= submit_tag "記録する" %>
+<% end %>

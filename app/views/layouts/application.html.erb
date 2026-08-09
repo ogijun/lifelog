@@ -1,29 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-    <title><%= content_for(:title) || "Lifelog" %></title>
+    <title><%= content_for(:title) || "lifelog" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Lifelog">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <%= yield %>
+    <header>
+      <h1><%= link_to "lifelog", root_path %></h1>
+      <nav>
+        <%= link_to "時系列", root_path %>
+        <%= link_to "今日の候補", wishlist_path %>
+        <span class="sep">記録する</span>
+        <%= link_to "本", new_book_path %>
+        <%= link_to "映画", new_film_path %>
+        <%= link_to "料理", new_dish_path %>
+        <%= link_to "場所", new_place_path %>
+      </nav>
+    </header>
+
+    <main><%= yield %></main>
   </body>
 </html>
