@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "lifelog",
+  "project_id": "abe0dea5-f5bc-4605-807a-547644776faa"
+}
