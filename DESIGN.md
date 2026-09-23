@@ -40,7 +40,7 @@ CREATE TABLE subjects (
   kind         TEXT NOT NULL,      -- book / film / dish / place (place = 外食の店)
   title        TEXT NOT NULL,
   creator      TEXT,               -- 著者・監督・店のジャンルなど
-  external_ids TEXT,               -- JSON: {"isbn": "...", "tmdb": "...", "google_place": "..."}
+  external_ids TEXT,               -- JSON: {"isbn": "...", "tmdb": "...", "google_place": "...", "url": "..."}
   lat          REAL,               -- 場所の検索に使うので JSON ではなく独立カラム
   lng          REAL,
   created_at   TEXT NOT NULL
