@@ -3,14 +3,14 @@ require "test_helper"
 class RecordingFlowTest < ActionDispatch::IntegrationTest
   test "4種類それぞれのフォームが独立して開く" do
     { new_book_path => "本を記録する", new_film_path => "映画を記録する",
-      new_dish_path => "料理を記録する", new_place_path => "場所を記録する" }.each do |path, heading|
+      new_dish_path => "料理を記録する", new_place_path => "店を記録する" }.each do |path, heading|
       get path
       assert_response :success
       assert_select "h2", heading
     end
   end
 
-  test "場所のフォームにだけ緯度経度がある" do
+  test "店のフォームにだけ緯度経度がある" do
     get new_place_path
     assert_select "input[name='subject[lat]']"
 
@@ -86,7 +86,7 @@ end
 class ListingTest < ActionDispatch::IntegrationTest
   test "時系列は kind をまたいで一本に並び kind で絞れる" do
     post books_path, params: { subject: { title: "細雪" }, event: { type: "did", occurred_on: "2026-01-01" } }
-    post places_path, params: { subject: { title: "蘆屋" }, event: { type: "did", occurred_on: "2026-05-01" } }
+    post places_path, params: { subject: { title: "芦屋の割烹" }, event: { type: "did", occurred_on: "2026-05-01" } }
 
     get root_path
     assert_response :success
