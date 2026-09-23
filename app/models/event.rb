@@ -13,6 +13,9 @@ class Event < ApplicationRecord
   belongs_to :cause, class_name: "Event", foreign_key: :caused_by, optional: true
   has_many :effects, class_name: "Event", foreign_key: :caused_by, dependent: :nullify
 
+  # フォームの「きっかけ: —」は空文字を送る。そのままだと FK 制約に落ちる。
+  normalizes :caused_by, with: ->(id) { id.presence }
+
   validates :type, inclusion: { in: TYPES }
   validates :occurred_on, presence: true
   validates :rating, numericality: { in: 1..5 }, allow_nil: true
