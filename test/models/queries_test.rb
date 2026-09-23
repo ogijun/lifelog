@@ -31,16 +31,16 @@ end
 class TimelineTest < ActiveSupport::TestCase
   test "全 kind が occurred_on の降順で一本に並ぶ" do
     book = Subject.create!(kind: "book", title: "細雪")
-    place = Subject.create!(kind: "place", title: "蘆屋")
+    place = Subject.create!(kind: "place", title: "芦屋の割烹")
     Event.create!(subject: book, type: "did", occurred_on: Date.new(2026, 1, 1))
     Event.create!(subject: place, type: "did", occurred_on: Date.new(2026, 5, 1))
 
-    assert_equal [ "蘆屋", "細雪" ], Timeline.recent.map { |e| e.subject.title }
+    assert_equal [ "芦屋の割烹", "細雪" ], Timeline.recent.map { |e| e.subject.title }
   end
 
   test "kind で絞れる" do
     book = Subject.create!(kind: "book", title: "細雪")
-    place = Subject.create!(kind: "place", title: "蘆屋")
+    place = Subject.create!(kind: "place", title: "芦屋の割烹")
     Event.create!(subject: book, type: "did", occurred_on: Date.new(2026, 1, 1))
     Event.create!(subject: place, type: "did", occurred_on: Date.new(2026, 5, 1))
 
