@@ -1,8 +1,8 @@
 # lifelog 設計
 
-本・映画・料理・場所を**同一のデータモデル**で記録し、体験どうしの相互参照を辿れるようにする個人用ライフログ。
+本・映画・料理・店を**同一のデータモデル**で記録し、体験どうしの相互参照を辿れるようにする個人用ライフログ。
 
-小説を読む → 映画化を観る → 舞台の街に行く → そこで食べたものを再現する、という連鎖が一本の線として辿れることが目的。
+小説を読む → 映画化を観る → 舞台の街の店に行く → そこで食べたものを再現する、という連鎖が一本の線として辿れることが目的。
 
 ## 設計指針
 
@@ -37,9 +37,9 @@ SPA を採らないのは、フォームの入力途中・一覧のフィルタ�
 ```sql
 CREATE TABLE subjects (
   id           TEXT PRIMARY KEY,   -- UUID v4
-  kind         TEXT NOT NULL,      -- book / film / dish / place
+  kind         TEXT NOT NULL,      -- book / film / dish / place (place = 外食の店)
   title        TEXT NOT NULL,
-  creator      TEXT,               -- 著者・監督・店名など
+  creator      TEXT,               -- 著者・監督・店のジャンルなど
   external_ids TEXT,               -- JSON: {"isbn": "...", "tmdb": "...", "google_place": "..."}
   lat          REAL,               -- 場所の検索に使うので JSON ではなく独立カラム
   lng          REAL,
@@ -91,6 +91,12 @@ Rails では `type` は STI 用の予約カラムだが、handoff の DDL に忠
 `Event.inheritance_column = nil` で STI を無効化する。カラム名を変えると
 DDL とアプリの語彙がずれ、10年後に読む自分が混乱する方が高くつく。
 
+**`place` は外食の店として解釈する。kind の値は変えない。**
+いま店以外の場所を記録する必要がほぼないため、`place` を飲食店専用に読み替え、表示を「店」
+(行きたい / 行った) にした。料理 (`dish`) は自炊 (作りたい / 作った) で、外食はここに入る。
+値を `restaurant` にリネームしないのは、routes / controller / 既存データまで変更が波及するうえ、
+店以外の場所が必要になったときに別 kind として足す余地を残せるため。
+
 **ID は UUID v4 の文字列。**
 handoff の DDL が TEXT PRIMARY KEY であること、および外部 API から取得したデータを
 オフラインで生成・後からマージする余地を残すため。連番の採番は「次の値」という状態を DB に作る。
@@ -103,7 +109,7 @@ handoff の DDL が TEXT PRIMARY KEY であること、および外部 API か�
 シードは日付から導出するので、**保存する状態はゼロ**。
 
 **イベント型を kind ごとに分けるか** → 分けない。`wished` / `did` / `dropped` の3種のみ。
-場所の「住んだ」のような区別は `note` に書く。kind ごとに許可型を変えると `kind` と `type` の間に
+店の「予約した」のような区別は `note` に書く。kind ごとに許可型を変えると `kind` と `type` の間に
 結合が生まれ、横断クエリと一覧ビューの両方に分岐が波及する。必要になってから足す。
 
 **入力フォームは kind ごとに4つコピーして作る。**
