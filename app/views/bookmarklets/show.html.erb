@@ -1,0 +1,13 @@
+<% content_for :title, "ブックマークレット" %>
+
+<h2>ブックマークレット</h2>
+
+<p>
+  下のリンクをブックマークバーにドラッグする。Google マップで店を開いた状態で押すと、
+  店名・座標・URL を埋めた店のフォームが開く。ほかのサイトではページタイトルと URL が入る。
+</p>
+
+<p class="bookmarklet">
+  <%= link_to "lifelog に店を記録",
+        "javascript:location.href='#{new_place_url}?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)" %>
+</p>

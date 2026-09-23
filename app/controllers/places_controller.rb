@@ -2,8 +2,12 @@
 class PlacesController < ApplicationController
   before_action { @causes = Timeline.recent(limit: 50) }
 
+  # ブックマークレットから ?url=&title= 付きで開かれたら値を埋める。保存はしない。
   def new
-    @subject = Subject.new(kind: "place")
+    found = GoogleMapsUrl.parse(params[:url])
+    @subject = Subject.new(kind: "place", title: found&.name || params[:title],
+                           lat: found&.lat, lng: found&.lng,
+                           external_ids: { "url" => params[:url] }.compact_blank)
     @event = Event.new(type: "wished", occurred_on: Date.current)
   end
 
@@ -21,10 +25,10 @@ class PlacesController < ApplicationController
   private
 
   def subject_params
-    p = params.expect(subject: [ :title, :creator, :lat, :lng, :google_place ])
+    p = params.expect(subject: [ :title, :creator, :lat, :lng, :google_place, :url ])
     { kind: "place", title: p[:title], creator: p[:creator],
       lat: p[:lat].presence, lng: p[:lng].presence,
-      external_ids: { "google_place" => p[:google_place] }.compact_blank }
+      external_ids: { "google_place" => p[:google_place], "url" => p[:url] }.compact_blank }
   end
 
   def event_params
