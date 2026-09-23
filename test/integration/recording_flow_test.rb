@@ -70,14 +70,14 @@ class RecordingFlowTest < ActionDispatch::IntegrationTest
 
   test "caused_by で連鎖が辿れる" do
     post books_path, params: { subject: { title: "細雪" }, event: { type: "did", occurred_on: "2026-01-01" } }
-    read = Event.last
+    read = Subject.find_by!(title: "細雪").events.sole
 
     post films_path, params: {
       subject: { title: "細雪 (1983)", creator: "市川崑" },
       event: { type: "wished", occurred_on: "2026-01-05", caused_by: read.id }
     }
 
-    assert_equal read, Event.last.cause
+    assert_equal read, Subject.find_by!(title: "細雪 (1983)").events.sole.cause
     get root_path
     assert_select ".cause", /細雪 から/
   end
