@@ -47,4 +47,9 @@ class EventTest < ActiveSupport::TestCase
     assert_equal read, watch.reload.cause
     assert_equal [ watch ], read.effects.to_a
   end
+
+  test "フォームの「きっかけ: —」が送る空文字の caused_by は nil として保存される" do
+    e = Event.create!(subject: subject!, type: "did", occurred_on: Date.new(2026, 1, 1), caused_by: "")
+    assert_nil e.reload.caused_by
+  end
 end
