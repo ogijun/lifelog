@@ -8,5 +8,9 @@
   <% if event.cause %>
     <span class="cause">← <%= link_to event.cause.subject.title, event.cause.subject %> から</span>
   <% end %>
+  <% if event.undoable? %>
+    <%= button_to "取り消す", event_path(event), method: :delete, class: "undo",
+          form: { data: { turbo_confirm: "この記録を取り消す？ 最初の記録なら対象ごと消える。" } } %>
+  <% end %>
   <% if event.note.present? %><p class="note"><%= event.note %></p><% end %>
 </li>

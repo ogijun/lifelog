@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   resources :subjects, only: :show do
     resources :events, only: :create
   end
+  resources :events, only: :destroy
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
