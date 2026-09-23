@@ -1,15 +1,15 @@
-<%# 場所のフォーム。books / films / dishes のコピー。統合しないこと (DESIGN.md)。 %>
-<% content_for :title, "場所を記録する" %>
+<%# 店 (外食の飲食店) のフォーム。kind は place のまま。books / films / dishes のコピー。統合しないこと (DESIGN.md)。 %>
+<% content_for :title, "店を記録する" %>
 
-<h2>場所を記録する</h2>
+<h2>店を記録する</h2>
 
 <%= form_with url: places_path, scope: nil, class: "record" do |f| %>
   <%= render "shared/errors", records: [ @subject, @event ] %>
 
   <fieldset>
-    <legend>場所</legend>
-    <label>名前<%= text_field_tag "subject[title]", @subject.title, required: true, autofocus: true %></label>
-    <label>店名・運営<%= text_field_tag "subject[creator]", @subject.creator %></label>
+    <legend>店</legend>
+    <label>店名<%= text_field_tag "subject[title]", @subject.title, required: true, autofocus: true %></label>
+    <label>ジャンル<%= text_field_tag "subject[creator]", @subject.creator %></label>
     <label>緯度<%= number_field_tag "subject[lat]", @subject.lat, step: "any" %></label>
     <label>経度<%= number_field_tag "subject[lng]", @subject.lng, step: "any" %></label>
     <label>Google Place ID<%= text_field_tag "subject[google_place]", @subject.external_ids["google_place"] %></label>

@@ -1,4 +1,4 @@
-# 場所の記録。books / films / dishes のコピー。lat/lng を持つのはここだけ。
+# 店 (外食の飲食店) の記録。kind は place のまま (DESIGN.md)。books / films / dishes のコピー。lat/lng を持つのはここだけ。
 class PlacesController < ApplicationController
   before_action { @causes = Timeline.recent(limit: 50) }
 
