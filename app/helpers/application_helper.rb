@@ -1,5 +1,5 @@
 module ApplicationHelper
-  KIND_LABELS = { "book" => "本", "film" => "映画", "dish" => "料理", "place" => "場所" }.freeze
+  KIND_LABELS = { "book" => "本", "film" => "映画", "dish" => "料理", "place" => "店" }.freeze
   TYPE_LABELS = { "wished" => "したい", "did" => "した", "dropped" => "やめた" }.freeze
   # 表示上の述語だけを種類ごとに変える。許可するイベント型は種類によらず共通 (DESIGN.md)。
   VERB_LABELS = {
