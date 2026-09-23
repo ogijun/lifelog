@@ -3,7 +3,8 @@ class DishesController < ApplicationController
   before_action { @causes = Timeline.recent(limit: 50) }
 
   def new
-    @subject = Subject.new(kind: "dish")
+    # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
+    @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "dish" })
     @event = Event.new(type: "wished", occurred_on: Date.current)
   end
 

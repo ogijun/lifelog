@@ -11,6 +11,7 @@
     <label>タイトル<%= text_field_tag "subject[title]", @subject.title, required: true, autofocus: true %></label>
     <label>監督<%= text_field_tag "subject[creator]", @subject.creator %></label>
     <label>TMDB ID<%= text_field_tag "subject[tmdb]", @subject.external_ids["tmdb"] %></label>
+    <label>URL<%= url_field_tag "subject[url]", @subject.external_ids["url"] %></label>
   </fieldset>
 
   <fieldset>

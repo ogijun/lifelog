@@ -3,11 +3,12 @@
 <h2>ブックマークレット</h2>
 
 <p>
-  下のリンクをブックマークバーにドラッグする。Google マップで店を開いた状態で押すと、
-  店名・座標・URL を埋めた店のフォームが開く。ほかのサイトではページタイトルと URL が入る。
+  下のリンクをブックマークバーにドラッグする。記録したいページで押すと、
+  対応しているサイト (Google マップなど) なら値を埋めたフォームが開き、
+  それ以外では何として記録するかを選んでタイトルと URL を引き継ぐ。
 </p>
 
 <p class="bookmarklet">
   <%= link_to "lifelog に店を記録",
-        "javascript:location.href='#{new_place_url}?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)" %>
+        "javascript:location.href='#{capture_url}?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)" %>
 </p>
