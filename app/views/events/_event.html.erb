@@ -2,7 +2,7 @@
   <time datetime="<%= event.occurred_on.iso8601 %>"><%= l event.occurred_on, format: :long %></time>
   <span class="kind kind-<%= event.subject.kind %>"><%= kind_label(event.subject.kind) %></span>
   <%= link_to event.subject.title, event.subject %>
-  <span class="type type-<%= event.type %>"><%= type_label(event.type) %></span>
+  <span class="type type-<%= event.type %>"><%= type_label(event.type, event.subject.kind) %></span>
   <%= rating_stars(event.rating) %>
   <% if event.subject.creator.present? %><span class="creator"><%= event.subject.creator %></span><% end %>
   <% if event.cause %>
