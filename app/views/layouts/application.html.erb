@@ -23,6 +23,9 @@
       </nav>
     </header>
 
-    <main><%= yield %></main>
+    <main>
+      <% if alert %><p class="alert"><%= alert %></p><% end %>
+      <%= yield %>
+    </main>
   </body>
 </html>

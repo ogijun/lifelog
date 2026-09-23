@@ -8,6 +8,8 @@ class Event < ApplicationRecord
 
   TYPES = %w[wished did dropped].freeze
   IMMUTABLE = %w[type occurred_on].freeze
+  # 登録ミスの取り消しを許す期間。過ぎたら追記のみに戻る。
+  UNDO_WINDOW = 1.hour
 
   belongs_to :subject
   belongs_to :cause, class_name: "Event", foreign_key: :caused_by, optional: true
@@ -22,6 +24,8 @@ class Event < ApplicationRecord
   validate :transition_is_append_only, on: :update
 
   before_create { self.id ||= SecureRandom.uuid }
+
+  def undoable?(now: Time.current) = created_at > now - UNDO_WINDOW
 
   private
 

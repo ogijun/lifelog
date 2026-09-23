@@ -16,6 +16,17 @@ class EventsController < ApplicationController
     render "subjects/show", status: :unprocessable_entity
   end
 
+  def destroy
+    event = Event.find(params[:id])
+    subject = event.subject
+
+    if Recorder.undo(event)
+      redirect_to (subject.destroyed? ? root_path : subject), status: :see_other
+    else
+      redirect_to subject, status: :see_other, alert: "登録から1時間を過ぎたので取り消せない。"
+    end
+  end
+
   private
 
   def event_params

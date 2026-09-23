@@ -14,4 +14,16 @@ module Recorder
   def append(subject, **event)
     Event.create!(subject:, **event)
   end
+
+  # 登録ミスの取り消し。状態の変化ではないので追記ではなく削除する。
+  # 期限内のイベントだけを消し、イベントが残らなければ subject ごと消す。
+  def undo(event, now: Time.current)
+    return false unless event.undoable?(now:)
+
+    Event.transaction do
+      event.destroy!
+      event.subject.destroy! if event.subject.events.none?
+    end
+    true
+  end
 end

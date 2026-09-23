@@ -106,3 +106,22 @@ input[type="submit"] {
 .external-ids { display: grid; grid-template-columns: max-content 1fr; gap: .2rem 1rem; font-size: .85rem; }
 .external-ids dt { color: var(--muted); }
 .external-ids dd { margin: 0; }
+
+.event form.button_to { display: inline; }
+.event .undo {
+  font: inherit;
+  font-size: .8rem;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 .4rem;
+  cursor: pointer;
+}
+.event .undo:hover { color: var(--accent); border-color: var(--accent); }
+
+.alert {
+  border-left: 3px solid var(--accent);
+  padding: .3rem .7rem;
+  color: var(--accent);
+}
