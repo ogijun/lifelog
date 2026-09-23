@@ -3,7 +3,8 @@ class FilmsController < ApplicationController
   before_action { @causes = Timeline.recent(limit: 50) }
 
   def new
-    @subject = Subject.new(kind: "film")
+    # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
+    @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "film" })
     @event = Event.new(type: "wished", occurred_on: Date.current)
   end
 
@@ -21,9 +22,9 @@ class FilmsController < ApplicationController
   private
 
   def subject_params
-    p = params.expect(subject: [ :title, :creator, :tmdb ])
+    p = params.expect(subject: [ :title, :creator, :tmdb, :url ])
     { kind: "film", title: p[:title], creator: p[:creator],
-      external_ids: { "tmdb" => p[:tmdb] }.compact_blank }
+      external_ids: { "tmdb" => p[:tmdb], "url" => p[:url] }.compact_blank }
   end
 
   def event_params

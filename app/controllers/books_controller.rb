@@ -4,7 +4,8 @@ class BooksController < ApplicationController
   before_action { @causes = Timeline.recent(limit: 50) }
 
   def new
-    @subject = Subject.new(kind: "book")
+    # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
+    @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "book" })
     @event = Event.new(type: "wished", occurred_on: Date.current)
   end
 
@@ -22,9 +23,9 @@ class BooksController < ApplicationController
   private
 
   def subject_params
-    p = params.expect(subject: [ :title, :creator, :isbn ])
+    p = params.expect(subject: [ :title, :creator, :isbn, :url ])
     { kind: "book", title: p[:title], creator: p[:creator],
-      external_ids: { "isbn" => p[:isbn] }.compact_blank }
+      external_ids: { "isbn" => p[:isbn], "url" => p[:url] }.compact_blank }
   end
 
   def event_params

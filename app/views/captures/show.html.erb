@@ -1,0 +1,11 @@
+<% content_for :title, "何として記録する？" %>
+
+<h2>何として記録する？</h2>
+<p class="hint"><%= @title.presence || @url %></p>
+
+<ul class="kind-choice">
+  <li><%= link_to "本", new_book_path(subject: { title: @title, url: @url }) %></li>
+  <li><%= link_to "映画", new_film_path(subject: { title: @title, url: @url }) %></li>
+  <li><%= link_to "料理", new_dish_path(subject: { title: @title, recipe_url: @url }) %></li>
+  <li><%= link_to "店", new_place_path(subject: { title: @title, url: @url }) %></li>
+</ul>

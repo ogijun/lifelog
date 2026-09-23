@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   resources :dishes, only: [ :new, :create ]
   resources :places, only: [ :new, :create ]
   resource :bookmarklet, only: :show
+  resource :capture, only: :show
 
   resources :subjects, only: :show do
     resources :events, only: :create
