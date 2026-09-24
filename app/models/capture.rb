@@ -7,9 +7,12 @@ module Capture
 
   module_function
 
-  def recognizers = [ GoogleMaps, Tabelog, Amazon, Imdb ]
+  def recognizers = [ GoogleMaps, Tabelog, Amazon, Imdb, Wikipedia ]
 
   def recognize(url:, title:)
     recognizers.lazy.filter_map { |r| r.call(url:, title:) }.first
   end
+
+  # 種類を選ばせるときに引き継ぐ名前。サイト名の接尾辞だけ外す。
+  def fallback_title(title) = title.delete_suffix(" - Wikipedia")
 end
