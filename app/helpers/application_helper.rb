@@ -1,12 +1,13 @@
 module ApplicationHelper
-  KIND_LABELS = { "book" => "本", "film" => "映画", "dish" => "料理", "place" => "店" }.freeze
+  KIND_LABELS = { "book" => "本", "film" => "映画", "dish" => "料理", "place" => "店", "video" => "動画" }.freeze
   TYPE_LABELS = { "wished" => "したい", "did" => "した", "dropped" => "やめた" }.freeze
   # 表示上の述語だけを種類ごとに変える。許可するイベント型は種類によらず共通 (DESIGN.md)。
   VERB_LABELS = {
     "book" => { "wished" => "読みたい", "did" => "読んだ" },
     "film" => { "wished" => "観たい", "did" => "観た" },
     "dish" => { "wished" => "作りたい", "did" => "作った" },
-    "place" => { "wished" => "行きたい", "did" => "行った" }
+    "place" => { "wished" => "行きたい", "did" => "行った" },
+    "video" => { "wished" => "見たい", "did" => "見た" }
   }.freeze
 
   def kind_label(kind) = KIND_LABELS.fetch(kind, kind)

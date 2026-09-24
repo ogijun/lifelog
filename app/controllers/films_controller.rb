@@ -1,4 +1,4 @@
-# 映画の記録。books / dishes / places のコピー。DESIGN.md の通り統合しない。
+# 映画の記録。books / dishes / places / videos のコピー。DESIGN.md の通り統合しない。
 class FilmsController < ApplicationController
   before_action { @causes = Timeline.recent(limit: 50) }
 
