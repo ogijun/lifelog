@@ -16,6 +16,20 @@ class EventsController < ApplicationController
     render "subjects/show", status: :unprocessable_entity
   end
 
+  # 日付・評価・メモだけ直せる。種別 (type) は追記のみなので受け取らない。
+  def edit
+    @event = Event.find(params[:id])
+  end
+
+  def update
+    @event = Event.find(params[:id])
+    if @event.update(edit_params)
+      redirect_to @event.subject, status: :see_other
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   def destroy
     event = Event.find(params[:id])
     subject = event.subject
@@ -28,6 +42,12 @@ class EventsController < ApplicationController
   end
 
   private
+
+  def edit_params
+    p = params.expect(event: [ :occurred_year, :occurred_month, :occurred_day, :rating, :note ])
+    { rating: p[:rating], note: p[:note],
+      occurred_on: FuzzyDate.from_parts(year: p[:occurred_year], month: p[:occurred_month], day: p[:occurred_day]) }
+  end
 
   def event_params
     p = params.expect(event: [ :type, :occurred_year, :occurred_month, :occurred_day, :rating, :note, :caused_by ])
