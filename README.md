@@ -17,7 +17,7 @@ bin/rails server
 | 場所 | 役割 |
 | --- | --- |
 | `db/migrate/` | `subjects` / `events` の2テーブルと `current_state` ビュー |
-| `app/models/subject.rb` `event.rb` | 記録の対象と、追記のみの遷移イベント |
+| `app/models/subject.rb` `event.rb` | 記録の対象と、遷移イベント (種別は追記のみ、日付は精度可変) |
 | `app/models/current_state.rb` | ビューの読み取り専用モデル。「最新イベントが現在の状態」 |
 | `app/models/recorder.rb` `timeline.rb` `wishlist.rb` | 状態を持たないクエリ層 |
 | `app/controllers/{books,films,dishes,places}_controller.rb` | 種類ごとの入力。**意図的なコピー**、統合しない |

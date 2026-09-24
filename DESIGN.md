@@ -50,7 +50,7 @@ CREATE TABLE events (
   id          TEXT PRIMARY KEY,
   subject_id  TEXT NOT NULL REFERENCES subjects(id),
   type        TEXT NOT NULL,       -- wished / did / dropped
-  occurred_on TEXT NOT NULL,       -- ISO 8601 date
+  occurred_on TEXT,                -- 精度可変の ISO 8601: "2026" / "2026-03" / "2026-03-05"。NULL は不明
   rating      INTEGER,             -- 1-5, nullable
   note        TEXT,
   caused_by   TEXT REFERENCES events(id),  -- このイベントを引き起こしたイベント
@@ -62,7 +62,7 @@ SELECT s.*, e.type AS status, e.occurred_on AS as_of
 FROM subjects s
 JOIN events e ON e.id = (
   SELECT id FROM events WHERE subject_id = s.id
-  ORDER BY occurred_on DESC, id DESC LIMIT 1
+  ORDER BY occurred_on DESC, created_at DESC, id DESC LIMIT 1
 );
 ```
 
@@ -73,10 +73,22 @@ JOIN events e ON e.id = (
 計算でき、再読・再訪も `did` が複数並ぶだけで特別扱いが不要になる。
 アプリ側は基本的に `current_state` ビューを読むので、複雑性はビュー1箇所に閉じ込められる。
 
-**追記のみを守るのは遷移イベントだけ。**
-`type` と `occurred_on` は後から書き換えない (時系列上の意味が壊れるため)。モデルで readonly を強制する。
-一方 `rating` `note` `title` は普通に UPDATE してよい。「星いくつだったか」は最新の判断だけあれば十分で、
-訂正のたびに補正イベントを積むのは割に合わない。
+**追記のみを守るのは遷移の種類 (`type`) だけ。**
+「読みたい → 読んだ」を UPDATE で書き換えると遷移の履歴が消えるので、`type` は後から変えさせない
+(モデルで拒否する)。一方 `occurred_on` `rating` `note` `title` は普通に UPDATE してよい。
+「星いくつだったか」は最新の判断だけあれば十分で、訂正のたびに補正イベントを積むのは割に合わない。
+`occurred_on` も当初は追記のみだったが、曖昧日付を入れたときに外した (下記)。日付を直すと並び順が
+変わって状態が変わりうるが、状態はビューの導出なので他に直すものは無い。
+
+**日付は精度可変の文字列1列。不明 (NULL) も許す。**
+記憶があいまいな過去の体験を後から埋めるため、日付は年だけ・年月だけ・不明でも記録できる。
+team_wiki は「日時 + 精度」の2列で持つが、ここでは ISO 8601 の精度を落とした文字列1列にした。
+精度は桁数そのものなので、2列が食い違うという状態が生まれない。文字列順に並べると
+「年だけ = その年の初め」になり、SQLite の NULL は最小なので、新しい順では不明が最後
+(= いちばん古い扱い) に来る。ビューの並び順を変えずにこの意味になる。
+同じ日付どうしは記録順 (`created_at`) で並べる。UUID の `id` はランダムなので、同点の判定に使うと
+年だけ・不明のイベントどうしで状態が運任せになる。
+表示と入力は `FuzzyDate` (状態を持たない) が担う。
 
 **関係テーブルは作らない。**
 `caused_by` の自己参照だけに留める。任意の関係種別 (inspired_by, adapted_from 等) を張れる別テーブルは
