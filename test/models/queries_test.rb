@@ -38,6 +38,16 @@ class TimelineTest < ActiveSupport::TestCase
     assert_equal [ "芦屋の割烹", "細雪" ], Timeline.recent.map { |e| e.subject.title }
   end
 
+  test "年だけの日付はその年の初め、日付不明は最後、同じ日付は記録の新しい順" do
+    book = Subject.create!(kind: "book", title: "細雪")
+    Event.create!(subject: book, type: "did", occurred_on: nil, note: "不明")
+    Event.create!(subject: book, type: "wished", occurred_on: "2026", note: "年-1")
+    Event.create!(subject: book, type: "did", occurred_on: "2026-03-05", note: "日")
+    Event.create!(subject: book, type: "did", occurred_on: "2026", note: "年-2")
+
+    assert_equal [ "日", "年-2", "年-1", "不明" ], Timeline.recent.map(&:note)
+  end
+
   test "kind で絞れる" do
     book = Subject.create!(kind: "book", title: "細雪")
     place = Subject.create!(kind: "place", title: "芦屋の割烹")
