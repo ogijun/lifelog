@@ -6,6 +6,7 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "観た", type_label("did", "film")
     assert_equal "作りたい", type_label("wished", "dish")
     assert_equal "行った", type_label("did", "place")
+    assert_equal "見たい", type_label("wished", "video")
   end
 
   test "やめた は種類によらない" do
