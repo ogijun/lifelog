@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :films, only: [ :new, :create ]
   resources :dishes, only: [ :new, :create ]
   resources :places, only: [ :new, :create ]
+  resources :videos, only: [ :new, :create ]
   resource :bookmarklet, only: :show
   resource :capture, only: :show
 

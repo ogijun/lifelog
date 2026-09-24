@@ -1,7 +1,7 @@
-# 記録の対象。本・映画・料理・場所を同一テーブルで扱う。
+# 記録の対象。本・映画・料理・店・動画を同一テーブルで扱う。
 # 種類固有の属性は external_ids と同様に JSON へ逃がし、マイグレーションを不要にする。
 class Subject < ApplicationRecord
-  KINDS = %w[book film dish place].freeze
+  KINDS = %w[book film dish place video].freeze
 
   has_many :events, dependent: :destroy
 

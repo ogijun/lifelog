@@ -1,11 +1,10 @@
-# 本の記録。films / dishes / places / videos とほぼ同じ形をしているが、意図的に統合しない。
-# 1つのフォームに「今どの種類か」という状態を持たせないための重複。
-class BooksController < ApplicationController
+# 動画の記録。books / films / dishes / places のコピー。DESIGN.md の通り統合しない。
+class VideosController < ApplicationController
   before_action { @causes = Timeline.recent(limit: 50) }
 
   def new
     # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
-    @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "book" })
+    @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "video" })
     @event = Event.new(type: "wished", occurred_on: FuzzyDate.from_date(Date.current))
   end
 
@@ -23,9 +22,9 @@ class BooksController < ApplicationController
   private
 
   def subject_params
-    p = params.expect(subject: [ :title, :creator, :isbn, :url ])
-    { kind: "book", title: p[:title], creator: p[:creator],
-      external_ids: { "isbn" => p[:isbn], "url" => p[:url] }.compact_blank }
+    p = params.expect(subject: [ :title, :creator, :url ])
+    { kind: "video", title: p[:title], creator: p[:creator],
+      external_ids: { "url" => p[:url] }.compact_blank }
   end
 
   def event_params
