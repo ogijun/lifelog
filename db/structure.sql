@@ -23,6 +23,7 @@ JOIN events e ON e.id = (
  /*application='Lifelog'*/
 /* current_state(id,kind,title,creator,external_ids,lat,lng,created_at,status,as_of) */;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260925000002'),
 ('20260925000001'),
 ('20260809000002'),
 ('20260809000001');
