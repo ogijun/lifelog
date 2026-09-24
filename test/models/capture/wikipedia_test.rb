@@ -32,6 +32,20 @@ class Capture::WikipediaTest < ActiveSupport::TestCase
     assert_equal "book", recognize(url, "The Makioka Sisters (novel) - Wikipedia").kind
   end
 
+  test "括弧が無くても作品名が明らかに映画なら映画" do
+    [ "機動警察パトレイバー 2 the Movie", "映画ドラえもん のび太の恐竜", "劇場版 細雪", "細雪 ザ・ムービー" ].each do |title|
+      hit = recognize(JA, "#{title} - Wikipedia")
+      assert_equal [ "film", title ], [ hit&.kind, hit&.subject&.dig(:title) ], title
+    end
+    assert_equal "film", recognize("https://en.wikipedia.org/wiki/Patlabor_2:_The_Movie", "Patlabor 2: The Movie - Wikipedia").kind
+  end
+
+  test "映画についての記事は映画作品として当てない" do
+    [ "映画館", "映画秘宝", "映画の日", "映画監督", "Movie theater" ].each do |title|
+      assert_nil recognize(JA, "#{title} - Wikipedia"), title
+    end
+  end
+
   test "括弧が無い、または種類が分からない括弧なら nil (種類を選ばせる)" do
     assert_nil recognize(JA, "細雪 - Wikipedia")
     assert_nil recognize(JA, "細雪 (テレビドラマ) - Wikipedia")
