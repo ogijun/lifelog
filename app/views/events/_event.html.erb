@@ -8,6 +8,7 @@
   <% if event.cause %>
     <span class="cause">← <%= link_to event.cause.subject.title, event.cause.subject %> から</span>
   <% end %>
+  <%= link_to "編集", edit_event_path(event), class: "edit" %>
   <% if event.undoable? %>
     <%= button_to "取り消す", event_path(event), method: :delete, class: "undo",
           form: { data: { turbo_confirm: "この記録を取り消す？ 最初の記録なら対象ごと消える。" } } %>
