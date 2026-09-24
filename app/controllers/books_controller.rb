@@ -6,7 +6,7 @@ class BooksController < ApplicationController
   def new
     # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
     @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "book" })
-    @event = Event.new(type: "wished", occurred_on: Date.current)
+    @event = Event.new(type: "wished", occurred_on: FuzzyDate.from_date(Date.current))
   end
 
   def create
@@ -29,6 +29,8 @@ class BooksController < ApplicationController
   end
 
   def event_params
-    params.expect(event: [ :type, :occurred_on, :rating, :note, :caused_by ]).to_h.symbolize_keys
+    p = params.expect(event: [ :type, :occurred_year, :occurred_month, :occurred_day, :rating, :note, :caused_by ])
+    { type: p[:type], rating: p[:rating], note: p[:note], caused_by: p[:caused_by],
+      occurred_on: FuzzyDate.from_parts(year: p[:occurred_year], month: p[:occurred_month], day: p[:occurred_day]) }
   end
 end

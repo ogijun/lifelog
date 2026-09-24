@@ -22,7 +22,7 @@
 <%= form_with url: subject_events_path(@subject), scope: nil, class: "record" do %>
   <%= render "shared/errors", records: [ @event ] %>
   <label>種別<%= select_tag "event[type]", options_for_select(Event::TYPES.map { |t| [ type_label(t, @subject.kind), t ] }, @event.type) %></label>
-  <label>日付<%= date_field_tag "event[occurred_on]", @event.occurred_on, required: true %></label>
+  <%= render "shared/fuzzy_date_fields", value: @event.occurred_on %>
   <label>評価<%= select_tag "event[rating]", options_for_select((1..5).map { |n| [ "★" * n, n ] }, @event.rating), include_blank: "—" %></label>
   <label>メモ<%= text_area_tag "event[note]", @event.note, rows: 2 %></label>
   <%= submit_tag "追記する" %>
