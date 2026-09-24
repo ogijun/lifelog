@@ -18,6 +18,19 @@ class FuzzyDateFormTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "「今日」は日本時間で決まる" do
+    travel_to Time.utc(2026, 9, 24, 16, 30) do # 日本時間 9/25 1:30
+      get new_book_path
+      assert_select "input[name='event[occurred_day]'][value='25']"
+    end
+  end
+
+  test "詳細ページの追記フォームは、新しいできごとの日付だと分かる見出し" do
+    subject = record_book("細雪", year: "").subject
+    get subject_path(subject)
+    assert_select "form .fuzzy-date legend", /新しいできごとの日付/
+  end
+
   test "年だけ・年と月だけでも記録できる" do
     assert_equal "2019", record_book("細雪", year: "2019").occurred_on
     assert_equal "2019-05", record_book("陰翳礼讃", year: "2019", month: "5").occurred_on
