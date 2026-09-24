@@ -7,7 +7,7 @@ module Capture
 
   module_function
 
-  def recognizers = [ GoogleMaps, Tabelog, Amazon, Imdb, Wikipedia ]
+  def recognizers = [ GoogleMaps, Tabelog, Amazon, Imdb, Wikipedia, Kyounoryouri ]
 
   def recognize(url:, title:)
     recognizers.lazy.filter_map { |r| r.call(url:, title:) }.first
