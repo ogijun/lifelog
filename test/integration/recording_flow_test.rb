@@ -1,9 +1,9 @@
 require "test_helper"
 
 class RecordingFlowTest < ActionDispatch::IntegrationTest
-  test "4種類それぞれのフォームが独立して開く" do
-    { new_book_path => "本を記録する", new_film_path => "映画を記録する",
-      new_dish_path => "料理を記録する", new_place_path => "店を記録する" }.each do |path, heading|
+  test "5種類それぞれのフォームが独立して開く" do
+    { new_book_path => "本を記録する", new_film_path => "映画を記録する", new_dish_path => "料理を記録する",
+      new_place_path => "店を記録する", new_video_path => "動画を記録する" }.each do |path, heading|
       get path
       assert_response :success
       assert_select "h2", heading
