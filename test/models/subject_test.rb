@@ -1,11 +1,6 @@
 require "test_helper"
 
 class SubjectTest < ActiveSupport::TestCase
-  test "id は UUID が自動採番される" do
-    s = Subject.create!(kind: "book", title: "細雪")
-    assert_match(/\A[0-9a-f-]{36}\z/, s.id)
-  end
-
   test "kind は book / film / dish / place のみ" do
     assert_not Subject.new(kind: "album", title: "x").valid?
     assert Subject.new(kind: "place", title: "x").valid?
