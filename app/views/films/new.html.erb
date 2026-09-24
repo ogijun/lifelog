@@ -19,7 +19,7 @@
     <label>種別<%= select_tag "event[type]", options_for_select(Event::TYPES.map { |t| [ type_label(t, "film"), t ] }, @event.type) %></label>
     <label>日付<%= date_field_tag "event[occurred_on]", @event.occurred_on, required: true %></label>
     <label>評価<%= select_tag "event[rating]", options_for_select((1..5).map { |n| [ "★" * n, n ] }, @event.rating), include_blank: "—" %></label>
-    <label>きっかけ<%= select_tag "event[caused_by]", options_for_select(@causes.map { |e| [ "#{e.occurred_on} #{e.subject.title} (#{type_label(e.type, e.subject.kind)})", e.id ] }, @event.caused_by), include_blank: "—" %></label>
+    <label>きっかけ<%= select_tag "event[caused_by]", options_for_select(@causes.map { |e| [ "#{FuzzyDate.label(e.occurred_on)} #{e.subject.title} (#{type_label(e.type, e.subject.kind)})", e.id ] }, @event.caused_by), include_blank: "—" %></label>
     <label>メモ<%= text_area_tag "event[note]", @event.note, rows: 3 %></label>
   </fieldset>
 
