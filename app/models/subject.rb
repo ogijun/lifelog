@@ -12,5 +12,5 @@ class Subject < ApplicationRecord
   validates :kind, inclusion: { in: KINDS }
   validates :title, presence: true
 
-  before_create { self.id ||= SecureRandom.uuid }
+  before_create { self.id ||= ShortId.generate }
 end
