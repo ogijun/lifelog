@@ -1,13 +1,14 @@
 # 遷移イベント。現在の状態はこの列の最新から導出する (current_state ビュー)。
 #
-# type と occurred_on だけが追記のみ。時系列上の意味が壊れるため後から変更させない。
-# rating / note は最新の判断だけあればよいので普通に UPDATE してよい。
+# type だけが追記のみ。状態の変化は追記で表すので、遷移の種類は後から変更させない。
+# occurred_on (精度可変の日付、FuzzyDate) / rating / note は普通に UPDATE してよい。
+# 日付を直すと並び順が変わって状態が変わりうるが、状態は current_state ビューの導出なので整合する。
 class Event < ApplicationRecord
   # `type` は STI の予約カラムだが、DDL の語彙に忠実であることを優先する。
   self.inheritance_column = nil
 
   TYPES = %w[wished did dropped].freeze
-  IMMUTABLE = %w[type occurred_on].freeze
+  IMMUTABLE = %w[type].freeze
   # 登録ミスの取り消しを許す期間。過ぎたら追記のみに戻る。
   UNDO_WINDOW = 1.hour
 
@@ -19,7 +20,7 @@ class Event < ApplicationRecord
   normalizes :caused_by, with: ->(id) { id.presence }
 
   validates :type, inclusion: { in: TYPES }
-  validates :occurred_on, presence: true
+  validate :occurred_on_is_fuzzy_date
   validates :rating, numericality: { in: 1..5 }, allow_nil: true
   validate :transition_is_append_only, on: :update
 
@@ -28,6 +29,12 @@ class Event < ApplicationRecord
   def undoable?(now: Time.current) = created_at > now - UNDO_WINDOW
 
   private
+
+  def occurred_on_is_fuzzy_date
+    return if FuzzyDate.valid?(occurred_on)
+
+    errors.add(:occurred_on, "は「2019」「2019-05」「2019-05-03」の形の、暦にある日付にしてください")
+  end
 
   def transition_is_append_only
     IMMUTABLE.each do |attr|
