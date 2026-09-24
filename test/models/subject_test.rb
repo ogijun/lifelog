@@ -1,9 +1,10 @@
 require "test_helper"
 
 class SubjectTest < ActiveSupport::TestCase
-  test "kind は book / film / dish / place のみ" do
+  test "kind は book / film / dish / place / video のみ" do
     assert_not Subject.new(kind: "album", title: "x").valid?
     assert Subject.new(kind: "place", title: "x").valid?
+    assert Subject.new(kind: "video", title: "x").valid?
   end
 
   test "external_ids は JSON として往復する" do
