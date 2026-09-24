@@ -5,6 +5,8 @@ class CapturesController < ApplicationController
     @url = params[:url].to_s
     @title = params[:title].to_s
     hit = Capture.recognize(url: @url, title: @title)
-    redirect_to public_send("new_#{hit.kind}_path", subject: hit.subject) if hit
+    return redirect_to public_send("new_#{hit.kind}_path", subject: hit.subject) if hit
+
+    @title = Capture.fallback_title(@title)
   end
 end
