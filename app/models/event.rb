@@ -24,7 +24,7 @@ class Event < ApplicationRecord
   validates :rating, numericality: { in: 1..5 }, allow_nil: true
   validate :transition_is_append_only, on: :update
 
-  before_create { self.id ||= SecureRandom.uuid }
+  before_create { self.id ||= ShortId.generate }
 
   def undoable?(now: Time.current) = created_at > now - UNDO_WINDOW
 
