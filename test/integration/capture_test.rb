@@ -24,6 +24,14 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_place_path(subject: { title: "何かのページ", url: "https://example.com/x" })
   end
 
+  test "括弧の無い Wikipedia 記事は種類を選ばせ、名前から接尾辞を外す" do
+    url = "https://ja.wikipedia.org/wiki/%E7%B4%B0%E9%9B%AA"
+    get capture_path(url:, title: "細雪 - Wikipedia")
+
+    assert_response :success
+    assert_select "a[href=?]", new_book_path(subject: { title: "細雪", url: })
+  end
+
   test "4つのフォームはどれも subject パラメータで値が埋まる" do
     get new_book_path(subject: { title: "細雪", creator: "谷崎潤一郎", isbn: "9784101005058", url: "https://example.com/b" })
     assert_select "input[name='subject[isbn]'][value=?]", "9784101005058"
