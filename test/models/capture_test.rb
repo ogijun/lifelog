@@ -14,4 +14,9 @@ class CaptureTest < ActiveSupport::TestCase
     assert_equal "細雪", Capture.fallback_title("細雪 - Wikipedia")
     assert_equal "何かのページ", Capture.fallback_title("何かのページ")
   end
+
+  test "種類を選ばせるときの名前からは Google 検索の接尾辞も外す" do
+    assert_equal "細雪", Capture.fallback_title("細雪 - Google 検索")
+    assert_equal "細雪", Capture.fallback_title("細雪 - Google Search")
+  end
 end
