@@ -9,4 +9,9 @@ class CaptureTest < ActiveSupport::TestCase
   test "どの認識器にも当たらなければ nil" do
     assert_nil Capture.recognize(url: "https://example.com/", title: "何かのページ")
   end
+
+  test "種類を選ばせるときの名前からは Wikipedia の接尾辞を外す" do
+    assert_equal "細雪", Capture.fallback_title("細雪 - Wikipedia")
+    assert_equal "何かのページ", Capture.fallback_title("何かのページ")
+  end
 end
