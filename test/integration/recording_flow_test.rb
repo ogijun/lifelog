@@ -23,7 +23,7 @@ class RecordingFlowTest < ActionDispatch::IntegrationTest
     assert_difference [ "Subject.count", "Event.count" ], 1 do
       post books_path, params: {
         subject: { title: "細雪", creator: "谷崎潤一郎", isbn: "9784101005058" },
-        event: { type: "wished", occurred_on: "2026-01-01", note: "映画の前に" }
+        event: { type: "wished", occurred_year: "2026", occurred_month: "1", occurred_day: "1", note: "映画の前に" }
       }
     end
 
@@ -38,28 +38,28 @@ class RecordingFlowTest < ActionDispatch::IntegrationTest
 
   test "タイトルが空なら 422 でフォームに戻る" do
     assert_no_difference "Subject.count" do
-      post books_path, params: { subject: { title: "" }, event: { type: "wished", occurred_on: "2026-01-01" } }
+      post books_path, params: { subject: { title: "" }, event: { type: "wished", occurred_year: "2026", occurred_month: "1", occurred_day: "1" } }
     end
     assert_response :unprocessable_entity
     assert_select ".errors"
   end
 
   test "詳細から追記すると状態が変わる" do
-    post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_on: "2026-01-01" } }
+    post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_year: "2026", occurred_month: "1", occurred_day: "1" } }
     subject = Subject.last
 
-    post subject_events_path(subject), params: { event: { type: "did", occurred_on: "2026-03-01", rating: "5" } }
+    post subject_events_path(subject), params: { event: { type: "did", occurred_year: "2026", occurred_month: "3", occurred_day: "1", rating: "5" } }
     assert_redirected_to subject
 
     assert_equal "did", CurrentState.find(subject.id).status
   end
 
   test "追記は Turbo Stream で一覧と状態を差し替える" do
-    post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_on: "2026-01-01" } }
+    post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_year: "2026", occurred_month: "1", occurred_day: "1" } }
     subject = Subject.last
 
     post subject_events_path(subject),
-      params: { event: { type: "did", occurred_on: "2026-03-01" } },
+      params: { event: { type: "did", occurred_year: "2026", occurred_month: "3", occurred_day: "1" } },
       as: :turbo_stream
 
     assert_response :success
@@ -69,12 +69,12 @@ class RecordingFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "caused_by で連鎖が辿れる" do
-    post books_path, params: { subject: { title: "細雪" }, event: { type: "did", occurred_on: "2026-01-01" } }
+    post books_path, params: { subject: { title: "細雪" }, event: { type: "did", occurred_year: "2026", occurred_month: "1", occurred_day: "1" } }
     read = Subject.find_by!(title: "細雪").events.sole
 
     post films_path, params: {
       subject: { title: "細雪 (1983)", creator: "市川崑" },
-      event: { type: "wished", occurred_on: "2026-01-05", caused_by: read.id }
+      event: { type: "wished", occurred_year: "2026", occurred_month: "1", occurred_day: "5", caused_by: read.id }
     }
 
     assert_equal read, Subject.find_by!(title: "細雪 (1983)").events.sole.cause
@@ -85,8 +85,8 @@ end
 
 class ListingTest < ActionDispatch::IntegrationTest
   test "時系列は kind をまたいで一本に並び kind で絞れる" do
-    post books_path, params: { subject: { title: "細雪" }, event: { type: "did", occurred_on: "2026-01-01" } }
-    post places_path, params: { subject: { title: "芦屋の割烹" }, event: { type: "did", occurred_on: "2026-05-01" } }
+    post books_path, params: { subject: { title: "細雪" }, event: { type: "did", occurred_year: "2026", occurred_month: "1", occurred_day: "1" } }
+    post places_path, params: { subject: { title: "芦屋の割烹" }, event: { type: "did", occurred_year: "2026", occurred_month: "5", occurred_day: "1" } }
 
     get root_path
     assert_response :success
@@ -98,8 +98,8 @@ class ListingTest < ActionDispatch::IntegrationTest
   end
 
   test "今日の候補には wished だけが出る" do
-    post books_path, params: { subject: { title: "したい本" }, event: { type: "wished", occurred_on: "2026-01-01" } }
-    post films_path, params: { subject: { title: "観た映画" }, event: { type: "did", occurred_on: "2026-01-01" } }
+    post books_path, params: { subject: { title: "したい本" }, event: { type: "wished", occurred_year: "2026", occurred_month: "1", occurred_day: "1" } }
+    post films_path, params: { subject: { title: "観た映画" }, event: { type: "did", occurred_year: "2026", occurred_month: "1", occurred_day: "1" } }
 
     get wishlist_path
     assert_response :success
