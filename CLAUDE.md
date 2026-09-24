@@ -1,6 +1,6 @@
 # lifelog
 
-本・映画・料理・店 (外食) を同一のデータモデルで記録する個人用ライフログ。
+本・映画・料理・店 (外食)・動画を同一のデータモデルで記録する個人用ライフログ。
 Rails 8.1 / Hotwire (importmap) / SQLite。
 
 **設計判断とその理由はすべて [DESIGN.md](DESIGN.md) にある。実装を変える前に読むこと。**
@@ -8,9 +8,9 @@ Rails 8.1 / Hotwire (importmap) / SQLite。
 ## このリポジトリ固有の規約
 
 - **削減の優先順位は 状態 > 結合 > 複雑性 > コード量。** 対立したらこの順で決める。
-- **`app/controllers/{books,films,dishes,places}_controller.rb` と対応するフォームは意図的な重複。**
+- **`app/controllers/{books,films,dishes,places,videos}_controller.rb` と対応するフォームは意図的な重複。**
   「共通化できる」と見えるが、統一フォームは「今どの種類か」という状態を持つ。**統合しない。**
-  4つ全部に同じ変更を入れるのが正しい対応。
+  5つ全部に同じ変更を入れるのが正しい対応。
 - **`events.type` は追記のみ。** モデルで拒否している。
   状態を変えたいときは UPDATE ではなくイベントを追記する。`occurred_on` / `rating` / `note` / `title` は普通に UPDATE してよい。
 - **`events.occurred_on` は精度可変の文字列** (`"2026"` / `"2026-03"` / `"2026-03-05"` / `NULL` = 不明)。
@@ -22,7 +22,7 @@ Rails 8.1 / Hotwire (importmap) / SQLite。
 ## コマンド
 
 ```sh
-bin/rails test      # 124件, 1秒未満
+bin/rails test      # 128件, 1秒未満
 bin/rubocop
 bin/rails db:reset  # 再作成 + seed (連鎖の実例が入る)
 bin/rails server
