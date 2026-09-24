@@ -36,7 +36,8 @@ module Lifelog
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # 「今日」(フォームの初期値、今日の候補の日替わり) を日本時間で決める。DB には UTC のまま入る。
+    config.time_zone = "Tokyo"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
