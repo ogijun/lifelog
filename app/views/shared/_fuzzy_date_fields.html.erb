@@ -1,0 +1,8 @@
+<%# 精度可変の日付 (FuzzyDate)。分からない欄は空のまま。年が空なら日付不明。locals: value: %>
+<% parts = FuzzyDate.parts(value) %>
+<fieldset class="fuzzy-date">
+  <legend>日付 <small>分からない欄は空のまま</small></legend>
+  <%= number_field_tag "event[occurred_year]", parts[:year], placeholder: "年", min: 1, max: 9999, "aria-label": "年" %>
+  <%= number_field_tag "event[occurred_month]", parts[:month], placeholder: "月", min: 1, max: 12, "aria-label": "月" %>
+  <%= number_field_tag "event[occurred_day]", parts[:day], placeholder: "日", min: 1, max: 31, "aria-label": "日" %>
+</fieldset>

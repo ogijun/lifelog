@@ -83,6 +83,12 @@ h3 { font-size: .95rem; color: var(--muted); margin-top: 2rem; }
 .record fieldset { border: 1px solid var(--line); padding: 1rem; display: flex; flex-direction: column; gap: .6rem; }
 .record legend { font-size: .8rem; color: var(--muted); padding: 0 .4rem; }
 .record label { display: flex; flex-direction: column; gap: .2rem; font-size: .8rem; color: var(--muted); }
+/* 年・月・日を横に並べる。外側の fieldset の中に入るので枠は付けない。 */
+.record fieldset.fuzzy-date { border: 0; padding: 0; flex-direction: row; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.record .fuzzy-date legend { padding: 0; margin-bottom: .2rem; }
+.record .fuzzy-date legend small { margin-left: .4rem; }
+.fuzzy-date input { width: 5rem; }
+.fuzzy-date input[name$="[occurred_year]"] { width: 6.5rem; }
 
 input, select, textarea {
   font: inherit;
