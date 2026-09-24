@@ -58,7 +58,7 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
   test "記録すると元 URL が external_ids に入る" do
     post books_path, params: {
       subject: { title: "細雪", url: "https://example.com/b" },
-      event: { type: "wished", occurred_on: "2026-01-01" }
+      event: { type: "wished", occurred_year: "2026", occurred_month: "1", occurred_day: "1" }
     }
 
     assert_equal "https://example.com/b", Subject.find_by!(title: "細雪").external_ids["url"]
