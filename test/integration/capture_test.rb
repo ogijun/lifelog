@@ -22,6 +22,7 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_film_path(subject: { title: "何かのページ", url: "https://example.com/x" })
     assert_select "a[href=?]", new_dish_path(subject: { title: "何かのページ", recipe_url: "https://example.com/x" })
     assert_select "a[href=?]", new_place_path(subject: { title: "何かのページ", url: "https://example.com/x" })
+    assert_select "a[href=?]", new_video_path(subject: { title: "何かのページ", url: "https://example.com/x" })
   end
 
   test "括弧の無い Wikipedia 記事は種類を選ばせ、名前から接尾辞を外す" do
@@ -32,7 +33,7 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_book_path(subject: { title: "細雪", url: })
   end
 
-  test "4つのフォームはどれも subject パラメータで値が埋まる" do
+  test "5つのフォームはどれも subject パラメータで値が埋まる" do
     get new_book_path(subject: { title: "細雪", creator: "谷崎潤一郎", isbn: "9784101005058", url: "https://example.com/b" })
     assert_select "input[name='subject[isbn]'][value=?]", "9784101005058"
     assert_select "input[name='subject[url]'][value=?]", "https://example.com/b"
@@ -43,6 +44,10 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
 
     get new_dish_path(subject: { title: "鯛の子の煮付け", recipe_url: "https://example.com/d" })
     assert_select "input[name='subject[recipe_url]'][value=?]", "https://example.com/d"
+
+    get new_video_path(subject: { title: "細雪を読む", creator: "読書チャンネル", url: "https://example.com/v" })
+    assert_select "input[name='subject[creator]'][value=?]", "読書チャンネル"
+    assert_select "input[name='subject[url]'][value=?]", "https://example.com/v"
 
     get new_place_path(subject: { title: "芦屋の割烹" })
     assert_select "input[name='subject[title]'][value=?]", "芦屋の割烹"
