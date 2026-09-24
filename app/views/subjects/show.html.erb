@@ -11,7 +11,7 @@
     いまの状態:
     <% if @state %>
       <span class="type type-<%= @state.status %>"><%= type_label(@state.status, @subject.kind) %></span>
-      <span class="as-of">(<%= l @state.as_of, format: :long %> 時点)</span>
+      <span class="as-of">(<%= FuzzyDate.label(@state.as_of) %> 時点)</span>
     <% else %>
       <span class="type">まだ何もない</span>
     <% end %>

@@ -6,6 +6,6 @@
   <p class="state">
     いまの状態:
     <span class="type type-<%= @state.status %>"><%= type_label(@state.status, @state.kind) %></span>
-    <span class="as-of">(<%= l @state.as_of, format: :long %> 時点)</span>
+    <span class="as-of">(<%= FuzzyDate.label(@state.as_of) %> 時点)</span>
   </p>
 <% end %>

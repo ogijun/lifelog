@@ -11,7 +11,7 @@ class EventsController < ApplicationController
     end
   rescue ActiveRecord::RecordInvalid => e
     @event = e.record
-    @events = @subject.events.includes(:cause).order(occurred_on: :desc, id: :desc)
+    @events = @subject.events.includes(:cause).order(occurred_on: :desc, created_at: :desc, id: :desc)
     @state = CurrentState.find_by(id: @subject.id)
     render "subjects/show", status: :unprocessable_entity
   end

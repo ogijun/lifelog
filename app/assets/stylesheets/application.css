@@ -63,7 +63,7 @@ h3 { font-size: .95rem; color: var(--muted); margin-top: 2rem; }
   gap: .5rem;
 }
 
-.event time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .8rem; min-width: 8.5rem; }
+.event time, .event .unknown-date { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .8rem; min-width: 8.5rem; }
 .event .note { flex-basis: 100%; margin: .2rem 0 0; font-size: .85rem; }
 
 .kind, .type {
