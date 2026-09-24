@@ -11,8 +11,10 @@ Rails 8.1 / Hotwire (importmap) / SQLite。
 - **`app/controllers/{books,films,dishes,places}_controller.rb` と対応するフォームは意図的な重複。**
   「共通化できる」と見えるが、統一フォームは「今どの種類か」という状態を持つ。**統合しない。**
   4つ全部に同じ変更を入れるのが正しい対応。
-- **`events.type` と `events.occurred_on` は追記のみ。** モデルで拒否している。
-  状態を変えたいときは UPDATE ではなくイベントを追記する。`rating` / `note` / `title` は普通に UPDATE してよい。
+- **`events.type` は追記のみ。** モデルで拒否している。
+  状態を変えたいときは UPDATE ではなくイベントを追記する。`occurred_on` / `rating` / `note` / `title` は普通に UPDATE してよい。
+- **`events.occurred_on` は精度可変の文字列** (`"2026"` / `"2026-03"` / `"2026-03-05"` / `NULL` = 不明)。
+  Date として扱わず `FuzzyDate` を通す。同じ日付どうしは `created_at` で並べる (`id` は UUID でランダム)。
 - **現在の状態は `current_state` ビューから読む。** `events` を直接畳んで status を計算しない。
 - **`events.type` は STI の予約カラム名だが `inheritance_column = nil` で無効化済み。** リネームしない。
 - **`schema_format = :sql`。** ビューを保持するため。migration 後は `db/structure.sql` をコミットする。
@@ -20,7 +22,7 @@ Rails 8.1 / Hotwire (importmap) / SQLite。
 ## コマンド
 
 ```sh
-bin/rails test      # 90件, 1秒未満
+bin/rails test      # 117件, 1秒未満
 bin/rubocop
 bin/rails db:reset  # 再作成 + seed (連鎖の実例が入る)
 bin/rails server
