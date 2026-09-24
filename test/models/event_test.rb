@@ -5,16 +5,35 @@ class EventTest < ActiveSupport::TestCase
     Subject.create!(kind: "book", title: "細雪", creator: "谷崎潤一郎")
   end
 
-  test "type と occurred_on は追記のみで書き換えられない" do
+  test "type は追記のみで書き換えられない" do
     e = Event.create!(subject: subject!, type: "wished", occurred_on: Date.new(2026, 1, 1))
 
     e.type = "did"
     assert_not e.valid?
     assert_includes e.errors[:type], "は後から変更できません"
+  end
 
-    e.reload.occurred_on = Date.new(2026, 2, 1)
-    assert_not e.valid?
-    assert_includes e.errors[:occurred_on], "は後から変更できません"
+  test "occurred_on は後から直せる" do
+    e = Event.create!(subject: subject!, type: "did", occurred_on: "2019")
+
+    assert e.update(occurred_on: "2019-05-03")
+    assert_equal "2019-05-03", e.reload.occurred_on
+  end
+
+  test "occurred_on は精度可変で、不明 (nil) も許す" do
+    s = subject!
+    [ nil, "2019", "2019-05", "2019-05-03", Date.new(2019, 5, 3) ].each do |occurred_on|
+      assert Event.new(subject: s, type: "did", occurred_on:).valid?, occurred_on.inspect
+    end
+  end
+
+  test "形式が違う・暦に無い occurred_on はエラー" do
+    s = subject!
+    [ "20x6", "2019-13", "2019-02-30", "2019/05/03" ].each do |occurred_on|
+      e = Event.new(subject: s, type: "did", occurred_on:)
+      assert_not e.valid?, occurred_on
+      assert_includes e.errors[:occurred_on], "は「2019」「2019-05」「2019-05-03」の形の、暦にある日付にしてください"
+    end
   end
 
   test "rating と note は普通に更新できる" do
