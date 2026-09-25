@@ -148,3 +148,24 @@ img.cover { max-width: 16rem; max-height: 20rem; object-fit: contain; border: 1p
 img.thumb { width: 2.4rem; height: 2.4rem; object-fit: cover; border-radius: 3px; vertical-align: middle; }
 .cover-box { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .8rem; margin: .8rem 0; }
 .cover-form { display: flex; align-items: flex-end; gap: .4rem; font-size: .8rem; color: var(--muted); }
+
+/* 状態を次に進めるボタン。いまの状態の横と今日の候補の各行に出す。 */
+.transitions form.button_to { display: inline; }
+.transition {
+  font: inherit;
+  font-size: .8rem;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: .05rem .6rem;
+  margin-left: .3rem;
+  cursor: pointer;
+}
+.transition:hover { background: var(--accent); color: var(--bg); }
+
+/* 「どうなった」は選択肢を横に並べて全部見せる。 */
+.record fieldset.type-choice { border: 0; padding: 0; flex-direction: row; flex-wrap: wrap; gap: .9rem; }
+.record .type-choice legend { padding: 0; margin-bottom: .2rem; }
+.record .type-choice label { flex-direction: row; align-items: center; gap: .3rem; font-size: .95rem; color: var(--fg); }
+.type-choice input[type="radio"] { width: auto; }

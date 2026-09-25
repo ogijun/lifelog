@@ -1,0 +1,11 @@
+<%# いまの状態と、次に進めるボタン。locals: subject:, state: %>
+<div class="state">
+  いまの状態:
+  <% if state %>
+    <span class="type type-<%= state.status %>"><%= type_label(state.status, subject.kind) %></span>
+    <span class="as-of">(<%= FuzzyDate.label(state.as_of) %> 時点)</span>
+    <%= render "shared/transition_buttons", subject:, status: state.status %>
+  <% else %>
+    <span class="type">まだ何もない</span>
+  <% end %>
+</div>

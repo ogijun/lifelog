@@ -13,6 +13,12 @@ module ApplicationHelper
   def kind_label(kind) = KIND_LABELS.fetch(kind, kind)
   def type_label(type, kind) = VERB_LABELS.dig(kind, type) || TYPE_LABELS.fetch(type, type)
 
+  # 状態を次に進めるボタンの文言。「見た」のあとの「見たい」は「また見たい」。
+  def transition_label(type, kind, from:)
+    label = type_label(type, kind)
+    from == "did" && type == "wished" ? "また#{label}" : label
+  end
+
   # 精度可変の日付 (FuzzyDate)。不明なら time 要素にしない。
   def fuzzy_date_tag(value)
     return tag.span(FuzzyDate.label(nil), class: "unknown-date") if value.nil?

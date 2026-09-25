@@ -20,6 +20,7 @@
       <%= link_to row.title, subject_path(row.id) %>
       <% if row.creator.present? %><span class="creator"><%= row.creator %></span><% end %>
       <span class="as-of"><%= wished_since(row.as_of) %></span>
+      <%= render "shared/transition_buttons", subject: row.subject, status: row.status %>
     </li>
   <% end %>
 </ol>
