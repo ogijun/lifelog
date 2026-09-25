@@ -1,0 +1,10 @@
+# 画像 (Subject#cover) の保存先。いまはローカルのディスク。
+# 保存先を切り替えるときは各環境の config.active_storage.service を変えるだけで済むように、
+# アプリ側は Active Storage の抽象だけを使う (ローカルのパスに依存しない)。
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
