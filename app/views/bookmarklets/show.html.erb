@@ -6,11 +6,15 @@
   下のリンクをブックマークバーにドラッグする。記録したいページで押すと、
   対応しているサイト (Google マップなど) なら値を埋めたフォームが開き、
   それ以外では何として記録するかを選んでタイトルと URL を引き継ぐ。
+  ページの画像 (og:image) があれば、記録したときに取り込む。
 </p>
+<p class="hint">2026-09 に画像を送るようにした。それより前に登録したブックマークレットは入れ直す。</p>
 
 <p class="hint">対応しているサイト: Google マップ・マップの共有リンク・食べログ (店) / Amazon (本) / IMDb (映画) / みんなのきょうの料理 (料理) / YouTube・Netflix・Prime Video・Disney+ (動画) / Wikipedia (記事名に「(映画)」「(小説)」などが付いているとき)</p>
 
 <p class="bookmarklet">
-  <%= link_to "lifelog に店を記録",
-        "javascript:location.href='#{capture_url}?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)" %>
+  <%= link_to "lifelog に記録",
+        "javascript:(()=>{const m=document.querySelector('meta[property=\"og:image\"],meta[name=\"twitter:image\"],meta[property=\"twitter:image\"]');" \
+        "const i=m&&m.content?new URL(m.content,location.href).href:'';" \
+        "location.href='#{capture_url}?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'&image='+encodeURIComponent(i)})()" %>
 </p>
