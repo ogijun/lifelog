@@ -16,7 +16,7 @@
 
   <fieldset>
     <legend>できごと</legend>
-    <label>種別<%= select_tag "event[type]", options_for_select(Event::TYPES.map { |t| [ type_label(t, "video"), t ] }, @event.type) %></label>
+    <%= render "shared/type_fields", kind: "video", selected: @event.type %>
     <%= render "shared/fuzzy_date_fields", value: @event.occurred_on %>
     <label>評価<%= select_tag "event[rating]", options_for_select((1..5).map { |n| [ "★" * n, n ] }, @event.rating), include_blank: "—" %></label>
     <label>きっかけ<%= select_tag "event[caused_by]", options_for_select(@causes.map { |e| [ "#{FuzzyDate.label(e.occurred_on)} #{e.subject.title} (#{type_label(e.type, e.subject.kind)})", e.id ] }, @event.caused_by), include_blank: "—" %></label>
