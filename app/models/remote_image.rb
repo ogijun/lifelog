@@ -22,8 +22,10 @@ module RemoteImage
   DENIED = %w[
     0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12
     192.0.0.0/24 192.168.0.0/16 198.18.0.0/15 224.0.0.0/4 240.0.0.0/4
-    ::/128 ::1/128 fc00::/7 fe80::/10 ff00::/8
+    ::/128 ::1/128 fc00::/7 fe80::/10 ff00::/8 64:ff9b:1::/48
   ].map { IPAddr.new(it) }.freeze
+  # NAT64 の既定の接頭辞。IPv6 の形で任意の IPv4 を埋め込める (64:ff9b::7f00:1 = 127.0.0.1)。
+  NAT64 = IPAddr.new("64:ff9b::/96")
 
   module_function
 
@@ -66,7 +68,7 @@ module RemoteImage
     addresses = resolver.call(host).map { IPAddr.new(it.to_s) }
     raise Refused, "名前解決できない" if addresses.empty?
 
-    denied = addresses.find { |addr| DENIED.any? { it.include?(addr.ipv4_mapped? ? addr.native : addr) } }
+    denied = addresses.find { |addr| [ addr, embedded_ipv4(addr) ].compact.any? { |a| DENIED.any? { it.include?(a) } } }
     raise Refused, "内部向けのアドレス (#{denied})" if denied
 
     addresses.first.to_s
@@ -74,14 +76,28 @@ module RemoteImage
     raise Refused, "アドレスが不正"
   end
 
+  # IPv6 の形に埋め込まれた IPv4 (IPv4-mapped と NAT64)。
+  def embedded_ipv4(addr)
+    return addr.native if addr.ipv4_mapped?
+
+    IPAddr.new(addr.to_i & 0xffff_ffff, Socket::AF_INET) if NAT64.include?(addr)
+  end
+
   def get(uri, ip)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.ipaddr = ip
-    http.use_ssl = uri.scheme == "https"
-    http.open_timeout = http.read_timeout = http.ssl_timeout = TIMEOUT
+    http = connection(uri, ip)
     http.start { http.request(Net::HTTP::Get.new(uri)) { return read_limited(it) } }
   rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError, OpenSSL::SSL::SSLError => e
     raise Refused, e.class.name
+  end
+
+  # 確かめた IP に直接つなぐ。証明書は URL のホスト名で検証される。
+  # プロキシは明示的に使わない (既定では環境変数の http_proxy を読み、IP への直接接続が効かなくなる)。
+  def connection(uri, ip)
+    http = Net::HTTP.new(uri.host, uri.port, nil)
+    http.ipaddr = ip
+    http.use_ssl = uri.scheme == "https"
+    http.open_timeout = http.read_timeout = http.ssl_timeout = TIMEOUT
+    http
   end
 
   def read_limited(response, max_bytes: MAX_BYTES)
