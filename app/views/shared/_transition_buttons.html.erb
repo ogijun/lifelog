@@ -1,0 +1,7 @@
+<%# 次の状態へ進めるボタン。日付は押した時点でサーバが決める。locals: subject:, status: %>
+<span class="transitions">
+  <% Event::NEXT_TYPES.fetch(status, []).each do |type| %>
+    <%= button_to transition_label(type, subject.kind, from: status), subject_transition_path(subject),
+          params: { type: }, class: "transition", form: { data: { turbo_frame: "_top" } } %>
+  <% end %>
+</span>

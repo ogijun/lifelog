@@ -3,9 +3,5 @@
 <% end %>
 
 <%= turbo_stream.update "state" do %>
-  <p class="state">
-    いまの状態:
-    <span class="type type-<%= @state.status %>"><%= type_label(@state.status, @state.kind) %></span>
-    <span class="as-of">(<%= FuzzyDate.label(@state.as_of) %> 時点)</span>
-  </p>
+  <%= render "subjects/state", subject: @subject, state: @state %>
 <% end %>
