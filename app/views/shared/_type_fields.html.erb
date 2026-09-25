@@ -1,0 +1,7 @@
+<%# 状態 (events.type) の選択。全部の選択肢が最初から見えるようにラジオで並べる。locals: kind:, selected: %>
+<fieldset class="type-choice">
+  <legend>どうなった</legend>
+  <% Event::TYPES.each do |type| %>
+    <label><%= radio_button_tag "event[type]", type, type == selected %><%= type_label(type, kind) %></label>
+  <% end %>
+</fieldset>
