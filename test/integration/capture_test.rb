@@ -75,4 +75,27 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a[href^='javascript:'][href*=?]", "#{capture_url}?url="
   end
+
+  test "ブックマークレットはページの og:image も送る" do
+    get bookmarklet_path
+    assert_select "a[href^='javascript:'][href*='og:image'][href*='twitter:image'][href*='&image=']"
+  end
+
+  test "送られてきた画像は、認識できたときも種類を選ばせるときも引き継ぐ" do
+    image = "https://img.example.com/a.jpg"
+    get capture_path(url: MAPS_URL, title: "芦屋の割烹 - Google マップ", image:)
+    assert_redirected_to new_place_path(subject: { title: "芦屋の割烹", lat: "34.7275", lng: "135.305", url: MAPS_URL, image_url: image })
+
+    get capture_path(url: "https://example.com/x", title: "何かのページ", image:)
+    assert_select "a[href=?]", new_book_path(subject: { title: "何かのページ", url: "https://example.com/x", image_url: image })
+    assert_select "a[href=?]", new_dish_path(subject: { title: "何かのページ", recipe_url: "https://example.com/x", image_url: image })
+  end
+
+  test "画像が無い・http(s) でないときは引き継がない" do
+    get capture_path(url: MAPS_URL, title: "芦屋の割烹 - Google マップ", image: "")
+    assert_redirected_to new_place_path(subject: { title: "芦屋の割烹", lat: "34.7275", lng: "135.305", url: MAPS_URL })
+
+    get capture_path(url: MAPS_URL, title: "芦屋の割烹 - Google マップ", image: "javascript:alert(1)")
+    assert_redirected_to new_place_path(subject: { title: "芦屋の割烹", lat: "34.7275", lng: "135.305", url: MAPS_URL })
+  end
 end
