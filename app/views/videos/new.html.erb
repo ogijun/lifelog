@@ -3,7 +3,7 @@
 
 <h2>動画を記録する</h2>
 
-<%= form_with url: videos_path, scope: nil, class: "record" do |f| %>
+<%= form_with url: videos_path, scope: nil, multipart: true, class: "record" do |f| %>
   <%= render "shared/errors", records: [ @subject, @event ] %>
 
   <fieldset>
@@ -11,6 +11,7 @@
     <label>タイトル<%= text_field_tag "subject[title]", @subject.title, required: true, autofocus: true %></label>
     <label>チャンネル<%= text_field_tag "subject[creator]", @subject.creator %></label>
     <label>URL<%= url_field_tag "subject[url]", @subject.external_ids["url"] %></label>
+    <%= render "shared/cover_fields", image_url: @image_url %>
   </fieldset>
 
   <fieldset>

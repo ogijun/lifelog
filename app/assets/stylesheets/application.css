@@ -133,3 +133,13 @@ input[type="submit"] {
   padding: .3rem .7rem;
   color: var(--accent);
 }
+
+.notice {
+  border-left: 3px solid var(--muted);
+  padding: .3rem .7rem;
+  color: var(--muted);
+}
+
+.cover-preview { margin: 0; display: flex; flex-direction: column; gap: .2rem; }
+.cover-preview img { max-width: 12rem; max-height: 12rem; object-fit: contain; border: 1px solid var(--line); }
+.cover-preview figcaption { font-size: .8rem; color: var(--muted); }

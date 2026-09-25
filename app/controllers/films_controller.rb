@@ -6,12 +6,14 @@ class FilmsController < ApplicationController
     # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
     @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "film" })
     @event = Event.new(type: "wished", occurred_on: FuzzyDate.from_date(Date.current))
+    @image_url = params.dig(:subject, :image_url)
   end
 
   def create
     @event = Recorder.start(subject: subject_params, event: event_params)
-    redirect_to @event.subject
+    redirect_to @event.subject, notice: attach_captured_cover(@event.subject)
   rescue ActiveRecord::RecordInvalid
+    @image_url = params.dig(:subject, :image_url)
     @subject = Subject.new(subject_params)
     @event = Event.new(event_params)
     @subject.validate
@@ -22,8 +24,8 @@ class FilmsController < ApplicationController
   private
 
   def subject_params
-    p = params.expect(subject: [ :title, :creator, :tmdb, :url ])
-    { kind: "film", title: p[:title], creator: p[:creator],
+    p = params.expect(subject: [ :title, :creator, :tmdb, :url, :cover ])
+    { kind: "film", title: p[:title], creator: p[:creator], cover: p[:cover],
       external_ids: { "tmdb" => p[:tmdb], "url" => p[:url] }.compact_blank }
   end
 

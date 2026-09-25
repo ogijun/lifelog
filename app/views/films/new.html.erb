@@ -3,7 +3,7 @@
 
 <h2>映画を記録する</h2>
 
-<%= form_with url: films_path, scope: nil, class: "record" do |f| %>
+<%= form_with url: films_path, scope: nil, multipart: true, class: "record" do |f| %>
   <%= render "shared/errors", records: [ @subject, @event ] %>
 
   <fieldset>
@@ -12,6 +12,7 @@
     <label>監督<%= text_field_tag "subject[creator]", @subject.creator %></label>
     <label>TMDB ID<%= text_field_tag "subject[tmdb]", @subject.external_ids["tmdb"] %></label>
     <label>URL<%= url_field_tag "subject[url]", @subject.external_ids["url"] %></label>
+    <%= render "shared/cover_fields", image_url: @image_url %>
   </fieldset>
 
   <fieldset>
