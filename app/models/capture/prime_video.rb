@@ -1,5 +1,5 @@
 # Prime Video の作品ページ。primevideo.com のタイトルは「Prime Video: 〇〇」。
-# amazon.co.jp 側は「Amazon.co.jp: 〇〇を観る | Prime Video」(取得を拒否されて未確認)。
+# amazon.co.jp 側は「〇〇を観る | Prime Video」(2026-09 に実物で確認)。「Amazon.co.jp: 」が付く形も外す。
 # amazon.co.jp の /dp/ は本と同じ形なので、タイトルが Prime Video のものだけ当てる。
 module Capture
   module PrimeVideo
