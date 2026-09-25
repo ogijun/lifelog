@@ -10,7 +10,7 @@ module Wishlist
   end
 
   def all(kind: nil)
-    CurrentState.with_status("wished").of_kind(kind).order(as_of: :asc).to_a
+    CurrentState.with_status("wished").of_kind(kind).includes(subject: { cover_attachment: :blob }).order(as_of: :asc).to_a
   end
 
   def seed_for(date) = date.to_time.to_i

@@ -6,6 +6,19 @@
 </h2>
 <% if @subject.creator.present? %><p class="creator"><%= @subject.creator %></p><% end %>
 
+<div class="cover-box">
+  <%= cover_image(@subject, "cover") %>
+  <%= form_with url: subject_cover_path(@subject), method: :patch, multipart: true, class: "cover-form" do %>
+    <label><%= @subject.cover.attached? ? "画像を差し替える" : "画像を付ける" %>
+      <%= file_field_tag :cover, accept: Subject::COVER_TYPES.join(","), required: true %></label>
+    <%= submit_tag "保存" %>
+  <% end %>
+  <% if @subject.cover.attached? %>
+    <%= button_to "画像を外す", subject_cover_path(@subject), method: :delete, class: "undo",
+          form: { data: { turbo_confirm: "画像を外す？" } } %>
+  <% end %>
+</div>
+
 <%= turbo_frame_tag "state" do %>
   <p class="state">
     いまの状態:
