@@ -44,6 +44,25 @@ class RemoteImageTest < ActiveSupport::TestCase
     end
   end
 
+  test "NAT64 のアドレスは中に埋め込まれた IPv4 で判定する" do
+    %w[64:ff9b::7f00:1 64:ff9b::a00:1 64:ff9b::a9fe:a9fe 64:ff9b:1::1].each do |ip|
+      assert_raises(RemoteImage::Refused, ip) { fetch("https://img.example.com/a.png", ips: [ ip ]) }
+    end
+    _, calls = fetch("https://img.example.com/a.png", ips: [ "64:ff9b::5db8:d70e" ]) # 93.184.215.14
+    assert_equal "64:ff9b::5db8:d70e", calls.sole.last
+  end
+
+  test "環境変数のプロキシ設定があっても使わない (使うと IP への直接接続が効かなくなる)" do
+    original = ENV.values_at("http_proxy", "https_proxy")
+    ENV["http_proxy"] = ENV["https_proxy"] = "http://proxy.example.com:3128"
+
+    http = RemoteImage.connection(URI("https://img.example.com/a.png"), PUBLIC_IP)
+    assert_not http.proxy?
+    assert_equal PUBLIC_IP, http.ipaddr
+  ensure
+    ENV["http_proxy"], ENV["https_proxy"] = original
+  end
+
   test "解決したアドレスに1つでも内部向けがあれば拒否" do
     assert_raises(RemoteImage::Refused) { fetch("https://img.example.com/a.png", ips: [ PUBLIC_IP, "127.0.0.1" ]) }
   end
