@@ -28,6 +28,13 @@ module ApplicationHelper
     "#{distance_of_time_in_words(Date.iso8601(as_of), Date.current)} 前から"
   end
 
+  # 対象の顔になる画像。無ければ何も出さない。
+  def cover_image(subject, css)
+    return unless subject.cover.attached?
+
+    image_tag subject.cover, alt: "", class: css, loading: "lazy"
+  end
+
   def rating_stars(rating)
     return if rating.blank?
     tag.span "★" * rating, class: "rating", title: "#{rating}/5"

@@ -14,6 +14,7 @@ Rails.application.routes.draw do
 
   resources :subjects, only: :show do
     resources :events, only: :create
+    resource :cover, only: [ :update, :destroy ]
   end
   resources :events, only: [ :edit, :update, :destroy ]
 

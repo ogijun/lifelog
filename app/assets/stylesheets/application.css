@@ -143,3 +143,8 @@ input[type="submit"] {
 .cover-preview { margin: 0; display: flex; flex-direction: column; gap: .2rem; }
 .cover-preview img { max-width: 12rem; max-height: 12rem; object-fit: contain; border: 1px solid var(--line); }
 .cover-preview figcaption { font-size: .8rem; color: var(--muted); }
+
+img.cover { max-width: 16rem; max-height: 20rem; object-fit: contain; border: 1px solid var(--line); }
+img.thumb { width: 2.4rem; height: 2.4rem; object-fit: cover; border-radius: 3px; vertical-align: middle; }
+.cover-box { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .8rem; margin: .8rem 0; }
+.cover-form { display: flex; align-items: flex-end; gap: .4rem; font-size: .8rem; color: var(--muted); }
