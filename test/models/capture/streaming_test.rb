@@ -1,6 +1,6 @@
 require "test_helper"
 
-# 形式は 2026-09 に実物で確認した (amazon.co.jp の Prime Video だけは取得を拒否されて未確認)。作品名は架空。
+# 形式は 2026-09 に実物で確認した。作品名は架空。
 class Capture::StreamingTest < ActiveSupport::TestCase
   def recognize(url, title) = Capture.recognize(url:, title:)
 
@@ -24,7 +24,7 @@ class Capture::StreamingTest < ActiveSupport::TestCase
   end
 
   test "Prime Video: amazon.co.jp の作品ページ (本の認識器より先に当てる)" do
-    detail = recognize("https://www.amazon.co.jp/gp/video/detail/B0ABCDEFGH/ref=x", "Amazon.co.jp: 細雪を観る | Prime Video")
+    detail = recognize("https://www.amazon.co.jp/gp/video/detail/B0ABCDEFGH?ref_=atv_hm", "細雪を観る | Prime Video")
     dp = recognize("https://www.amazon.co.jp/%E7%B4%B0%E9%9B%AA/dp/B0ABCDEFGH", "Amazon.co.jp: 細雪を観る | Prime Video")
 
     assert_equal [ "video", "細雪", "https://www.amazon.co.jp/gp/video/detail/B0ABCDEFGH/" ],
