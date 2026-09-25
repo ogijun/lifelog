@@ -4,7 +4,7 @@
 <h2>店を記録する</h2>
 <p class="hint"><%= link_to "ブックマークレット", bookmarklet_path %>を使うと Google マップから開ける。</p>
 
-<%= form_with url: places_path, scope: nil, class: "record" do |f| %>
+<%= form_with url: places_path, scope: nil, multipart: true, class: "record" do |f| %>
   <%= render "shared/errors", records: [ @subject, @event ] %>
 
   <fieldset>
@@ -15,6 +15,7 @@
     <label>経度<%= number_field_tag "subject[lng]", @subject.lng, step: "any" %></label>
     <label>Google Place ID<%= text_field_tag "subject[google_place]", @subject.external_ids["google_place"] %></label>
     <label>URL<%= url_field_tag "subject[url]", @subject.external_ids["url"] %></label>
+    <%= render "shared/cover_fields", image_url: @image_url %>
   </fieldset>
 
   <fieldset>

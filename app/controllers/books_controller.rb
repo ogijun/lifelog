@@ -7,12 +7,14 @@ class BooksController < ApplicationController
     # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
     @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "book" })
     @event = Event.new(type: "wished", occurred_on: FuzzyDate.from_date(Date.current))
+    @image_url = params.dig(:subject, :image_url)
   end
 
   def create
     @event = Recorder.start(subject: subject_params, event: event_params)
-    redirect_to @event.subject
+    redirect_to @event.subject, notice: attach_captured_cover(@event.subject)
   rescue ActiveRecord::RecordInvalid
+    @image_url = params.dig(:subject, :image_url)
     @subject = Subject.new(subject_params)
     @event = Event.new(event_params)
     @subject.validate
@@ -23,8 +25,8 @@ class BooksController < ApplicationController
   private
 
   def subject_params
-    p = params.expect(subject: [ :title, :creator, :isbn, :url ])
-    { kind: "book", title: p[:title], creator: p[:creator],
+    p = params.expect(subject: [ :title, :creator, :isbn, :url, :cover ])
+    { kind: "book", title: p[:title], creator: p[:creator], cover: p[:cover],
       external_ids: { "isbn" => p[:isbn], "url" => p[:url] }.compact_blank }
   end
 

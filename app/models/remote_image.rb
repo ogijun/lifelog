@@ -36,6 +36,23 @@ module RemoteImage
     Fetched.new(io: StringIO.new(body), content_type:, filename: "cover.#{content_type.split('/').last}")
   end
 
+  # capture で来た URL の画像を attachment (subject.cover) に付ける。取れなければ false。
+  def attach(attachment, url)
+    image = fetch(url)
+    attachment.attach(io: image.io, filename: image.filename, content_type: image.content_type)
+    true
+  rescue Refused => e
+    Rails.logger.info("RemoteImage refused #{url}: #{e.message}")
+    false
+  end
+
+  # プレビューに出してよい URL か (http(s) だけ。名前解決はしない)。
+  def http_url?(url)
+    parse(url) && true
+  rescue Refused
+    false
+  end
+
   def parse(url)
     uri = URI.parse(url.to_s)
     raise Refused, "http(s) ではない" unless uri.is_a?(URI::HTTP) && uri.host.present?
