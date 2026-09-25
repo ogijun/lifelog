@@ -4,12 +4,17 @@
 module Capture
   # subject は各フォームの subject パラメータと同じ形。そのまま new_<kind>_path に渡す。
   Hit = Data.define(:kind, :subject)
+  # Netflix の日本語タイトルなどに混ざるゼロ幅の文字。
+  ZERO_WIDTH = /[\u200B-\u200D\u2060\uFEFF]/
 
   module_function
 
-  def recognizers = [ GoogleMaps, GoogleSearch, Tabelog, Amazon, Imdb, Wikipedia, Kyounoryouri, Youtube ]
+  # PrimeVideo は amazon.co.jp の /dp/ で本 (Amazon) と形が重なるので先に置く。
+  def recognizers = [ GoogleMaps, GoogleSearch, Tabelog, PrimeVideo, Amazon, Imdb, Wikipedia, Kyounoryouri,
+                      Youtube, Netflix, DisneyPlus ]
 
   def recognize(url:, title:)
+    title = title.to_s.gsub(ZERO_WIDTH, "")
     recognizers.lazy.filter_map { |r| r.call(url:, title:) }.first
   end
 
