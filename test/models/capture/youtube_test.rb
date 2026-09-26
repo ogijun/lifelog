@@ -8,7 +8,7 @@ class Capture::YoutubeTest < ActiveSupport::TestCase
   test "動画ページは動画。名前から - YouTube を外し、URL を watch?v=<ID> にする" do
     hit = recognize("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL1&t=42s")
     assert_equal "video", hit.kind
-    assert_equal({ title: "細雪を読む", url: CANONICAL }, hit.subject)
+    assert_equal({ title: "細雪を読む", url: CANONICAL, image_url: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" }, hit.subject)
   end
 
   test "短縮 URL・ショート・モバイル版も同じ動画" do
