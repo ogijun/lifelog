@@ -2,7 +2,7 @@ require "test_helper"
 
 class UndoFlowTest < ActionDispatch::IntegrationTest
   setup do
-    post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_year: "2026", occurred_month: "1", occurred_day: "1" } }
+    post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_on: "2026/1/1" } }
     @subject = Subject.find_by!(title: "細雪")
     @event = @subject.events.sole
   end
@@ -17,7 +17,7 @@ class UndoFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "追記を取り消したら詳細ページに戻る" do
-    post subject_events_path(@subject), params: { event: { type: "did", occurred_year: "2026", occurred_month: "3", occurred_day: "1" } }
+    post subject_events_path(@subject), params: { event: { type: "did", occurred_on: "2026/3/1" } }
     appended = @subject.events.find_by!(type: "did")
 
     delete event_path(appended)
