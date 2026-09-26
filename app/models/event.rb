@@ -20,9 +20,12 @@ class Event < ApplicationRecord
 
   # フォームの「きっかけ: —」は空文字を送る。そのままだと FK 制約に落ちる。
   normalizes :caused_by, with: ->(id) { id.presence }
+  # 出どころ: どこでそれを知ったか (ブログや投稿の URL)。対象そのものの URL とは別。
+  normalizes :source_url, with: ->(url) { url.strip.presence }
 
   validates :type, inclusion: { in: TYPES }
   validate :occurred_on_is_fuzzy_date
+  validate :source_url_is_http, if: :source_url
   validates :rating, numericality: { in: 1..5 }, allow_nil: true
   validate :transition_is_append_only, on: :update
 
@@ -31,6 +34,10 @@ class Event < ApplicationRecord
   def undoable?(now: Time.current) = created_at > now - UNDO_WINDOW
 
   private
+
+  def source_url_is_http
+    errors.add(:source_url, "は http(s) の URL にしてください") unless HttpUrl.valid?(source_url)
+  end
 
   def occurred_on_is_fuzzy_date
     return if FuzzyDate.valid?(occurred_on)

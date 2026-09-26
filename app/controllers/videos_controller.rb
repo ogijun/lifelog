@@ -5,7 +5,7 @@ class VideosController < ApplicationController
   def new
     # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
     @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "video" })
-    @event = Event.new(type: "wished", occurred_on: FuzzyDate.from_date(Date.current))
+    @event = Event.new(type: "wished", occurred_on: FuzzyDate.from_date(Date.current), source_url: params[:source_url])
     @image_url = params.dig(:subject, :image_url)
   end
 
@@ -30,7 +30,8 @@ class VideosController < ApplicationController
   end
 
   def event_params
-    p = params.expect(event: [ :type, :occurred_on, :rating, :note, :caused_by ])
-    { type: p[:type], rating: p[:rating], note: p[:note], caused_by: p[:caused_by], occurred_on: FuzzyDate.parse(p[:occurred_on]) }
+    p = params.expect(event: [ :type, :occurred_on, :rating, :note, :caused_by, :source_url ])
+    { type: p[:type], rating: p[:rating], note: p[:note], caused_by: p[:caused_by], source_url: p[:source_url],
+      occurred_on: FuzzyDate.parse(p[:occurred_on]) }
   end
 end

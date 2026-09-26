@@ -172,3 +172,5 @@ img.thumb { width: 2.4rem; height: 2.4rem; object-fit: cover; border-radius: 3px
 .record .type-choice legend { padding: 0; margin-bottom: .2rem; }
 .record .type-choice label { flex-direction: row; align-items: center; gap: .3rem; font-size: .95rem; color: var(--fg); }
 .type-choice input[type="radio"] { width: auto; }
+
+.event .source { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
