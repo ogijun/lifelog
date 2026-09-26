@@ -31,8 +31,7 @@ class BooksController < ApplicationController
   end
 
   def event_params
-    p = params.expect(event: [ :type, :occurred_year, :occurred_month, :occurred_day, :rating, :note, :caused_by ])
-    { type: p[:type], rating: p[:rating], note: p[:note], caused_by: p[:caused_by],
-      occurred_on: FuzzyDate.from_parts(year: p[:occurred_year], month: p[:occurred_month], day: p[:occurred_day]) }
+    p = params.expect(event: [ :type, :occurred_on, :rating, :note, :caused_by ])
+    { type: p[:type], rating: p[:rating], note: p[:note], caused_by: p[:caused_by], occurred_on: FuzzyDate.parse(p[:occurred_on]) }
   end
 end

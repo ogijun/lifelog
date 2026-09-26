@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   resources :places, only: [ :new, :create ]
   resources :videos, only: [ :new, :create ]
   resource :bookmarklet, only: :show
+  # 日付の欄の入力中に、読み取った結果を返す (読み取りの規則はサーバの FuzzyDate.parse だけに置く)。
+  get "fuzzy_date", to: "fuzzy_dates#show", as: :fuzzy_date
   resource :capture, only: :show
 
   resources :subjects, only: :show do

@@ -35,7 +35,7 @@ class Event < ApplicationRecord
   def occurred_on_is_fuzzy_date
     return if FuzzyDate.valid?(occurred_on)
 
-    errors.add(:occurred_on, "は「2019」「2019-05」「2019-05-03」の形の、暦にある日付にしてください")
+    errors.add(:occurred_on, "は「2026/9/25」「2026/9」「2026」「今日」のように書いてください (暦にある日付で)")
   end
 
   def transition_is_append_only

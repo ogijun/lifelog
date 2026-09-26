@@ -6,17 +6,6 @@ module FuzzyDate
 
   module_function
 
-  # フォームの年・月・日から組むだけ。正しさは valid? (Event のバリデーション) が判定する。
-  # 粗い欄が空なら細かい欄は無視し、年が空なら不明。
-  def from_parts(year:, month:, day:)
-    year, month, day = [ year, month, day ].map { |part| part.to_s.strip.presence }
-    return unless year
-    return year unless month
-    return "#{year}-#{pad(month)}" unless day
-
-    "#{year}-#{pad(month)}-#{pad(day)}"
-  end
-
   def from_date(date) = date.iso8601
 
   SEPARATOR = %r{[/.\-]}
