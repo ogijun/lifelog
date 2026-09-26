@@ -36,9 +36,17 @@ module Capture
   # ページ内のリンクのうち、認識器が分かるものを候補にする (LLM を使わないパターンマッチ)。
   # ブックマークレットが「選んだ範囲 → 本文 → その他」の順に送るので、その順を保つ。
   # 名前の取れなかった候補には、hint (選んだ文字やページのタイトル) にある最初の『』を名前にする。
-  def candidates(links, hint: nil)
+  #
+  # 行き先でもリンクの文字でも分からなかったリンクは expand (URL の配列 -> { URL => 行き先 }) に渡し、
+  # 行き先が分かればそれで判定する。短縮 URL の解決は通信を伴うので外から渡す (ShortLink.expand_all)。
+  def candidates(links, hint: nil, expand: ->(_urls) { {} })
+    first = links.map { [ it, recognize_link(it) ] }
+    expanded = expand.call(first.filter_map { |link, hit| link.href unless hit })
+    hits = first.filter_map do |link, hit|
+      hit || (long = expanded[link.href]) && recognize(url: long, title: link_name(link.text))
+    end
     name = bracketed(hint)
-    links.filter_map { recognize_link(it) }.uniq { it.subject[:url] }.map do |hit|
+    hits.uniq { it.subject[:url] }.map do |hit|
       hit.subject[:title].present? || name.nil? ? hit : hit.with(subject: hit.subject.merge(title: name))
     end
   end
@@ -46,8 +54,11 @@ module Capture
   # 行き先で分からなければ、リンクの文字が URL ならそれで判定する。
   # X は投稿のリンクを t.co に置き換え、リンクの文字に元の URL を出すため。
   def recognize_link(link)
-    recognize(url: link.href, title: link.text) || (url = url_in_text(link.text)) && recognize(url:, title: "")
+    recognize(url: link.href, title: link_name(link.text)) || (url = url_in_text(link.text)) && recognize(url:, title: "")
   end
+
+  # リンクの文字を名前に使うか。「amazon.co.jp/dp/48144…」のような URL の切れ端は名前にしない。
+  def link_name(text) = text.to_s.match?(%r{\A\S+\.\S+/\S*\z}) ? "" : text.to_s
 
   # リンクの文字が URL そのものなら、その URL。「https://」の省かれた「amazon.co.jp/dp/…」も補う。
   # 途中で切られた (「…」付きの) ものや、ドメインらしくないものは使わない。
