@@ -2,7 +2,7 @@ require "test_helper"
 
 class CoverFormTest < ActionDispatch::IntegrationTest
   PNG = Rails.root.join("test/fixtures/files/cover.png")
-  EVENT = { type: "wished", occurred_year: "2026", occurred_month: "", occurred_day: "" }.freeze
+  EVENT = { type: "wished", occurred_on: "2026" }.freeze
 
   # 外部への通信の代わりに、決まった画像を返す。
   def with_remote_image
