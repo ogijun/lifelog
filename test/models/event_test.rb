@@ -32,7 +32,7 @@ class EventTest < ActiveSupport::TestCase
     [ "20x6", "2019-13", "2019-02-30", "2019/05/03" ].each do |occurred_on|
       e = Event.new(subject: s, type: "did", occurred_on:)
       assert_not e.valid?, occurred_on
-      assert_includes e.errors[:occurred_on], "は「2019」「2019-05」「2019-05-03」の形の、暦にある日付にしてください"
+      assert_includes e.errors[:occurred_on], "は「2026/9/25」「2026/9」「2026」「今日」のように書いてください (暦にある日付で)"
     end
   end
 
