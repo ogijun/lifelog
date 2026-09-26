@@ -67,6 +67,11 @@ class CaptureTest < ActiveSupport::TestCase
     assert_equal [ "細雪 上巻", "紹介動画" ], candidates.map { it.subject[:title] }
   end
 
+  test "『』を名前に使うのは本の候補だけ" do
+    links = Capture.links_from([ [ "https://youtu.be/dQw4w9WgXcQ", "" ] ].to_json)
+    assert_equal "", Capture.candidates(links, hint: "『本物』の味").sole.subject[:title]
+  end
+
   test "『』の中を取り出す" do
     assert_equal "細雪 上巻", Capture.bracketed("新刊『細雪 上巻』と『鍵』")
     assert_nil Capture.bracketed("括弧なし")
