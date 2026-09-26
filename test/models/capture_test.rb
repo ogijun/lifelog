@@ -42,6 +42,23 @@ class CaptureTest < ActiveSupport::TestCase
                  Capture.candidates(links).map { it.subject[:url] }
   end
 
+  test "行き先でも文字でも分からないリンクだけ解決に回し、見つかったものを元の順番で候補にする" do
+    links = Capture.links_from([ [ "https://t.co/known", "https://amazon.co.jp/dp/4101005052" ],
+                                 [ "https://t.co/hidden", "amazon.co.jp/dp/40410…" ],
+                                 [ "https://example.com/other", "other" ],
+                                 [ "https://youtu.be/dQw4w9WgXcQ", "紹介動画" ] ].to_json)
+    asked = nil
+    expand = lambda do |urls|
+      asked = urls
+      { "https://t.co/hidden" => "https://www.amazon.co.jp/dp/4041022093?tag=x" }
+    end
+    candidates = Capture.candidates(links, expand:)
+
+    assert_equal [ "https://t.co/hidden", "https://example.com/other" ], asked
+    assert_equal [ "https://www.amazon.co.jp/dp/4101005052", "https://www.amazon.co.jp/dp/4041022093",
+                   "https://www.youtube.com/watch?v=dQw4w9WgXcQ" ], candidates.map { it.subject[:url] }
+  end
+
   test "名前の取れない候補には、選んだ文字かページのタイトルにある最初の『』を名前にする" do
     links = Capture.links_from([ [ "https://t.co/x", "https://amazon.co.jp/dp/4101005052" ],
                                  [ "https://youtu.be/dQw4w9WgXcQ", "紹介動画" ] ].to_json)
