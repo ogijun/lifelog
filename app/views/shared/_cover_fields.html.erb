@@ -1,5 +1,5 @@
 <%# 対象の顔になる画像。capture で来た画像はプレビューを出し、記録したときに取り込む。locals: image_url: %>
-<% if image_url.present? && RemoteImage.http_url?(image_url) %>
+<% if image_url.present? && HttpUrl.valid?(image_url) %>
   <figure class="cover-preview">
     <%= image_tag image_url, alt: "", referrerpolicy: "no-referrer" %>
     <figcaption>記録するとこの画像を取り込む</figcaption>

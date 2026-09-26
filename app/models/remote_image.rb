@@ -48,13 +48,6 @@ module RemoteImage
     false
   end
 
-  # プレビューに出してよい URL か (http(s) だけ。名前解決はしない)。
-  def http_url?(url)
-    parse(url) && true
-  rescue Refused
-    false
-  end
-
   def parse(url)
     uri = URI.parse(url.to_s)
     raise Refused, "http(s) ではない" unless uri.is_a?(URI::HTTP) && uri.host.present?
