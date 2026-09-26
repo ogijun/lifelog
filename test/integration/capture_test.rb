@@ -133,6 +133,19 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
                                                          source_url: tweet)
   end
 
+  test "短縮 URL の行き先も調べて候補を探す" do
+    original = ShortLink.method(:expand_all)
+    ShortLink.define_singleton_method(:expand_all) { |urls, **| urls.to_h { [ it, "https://www.amazon.co.jp/dp/4101005052" ] } }
+    get capture_path(url: "https://x.com/someone/status/1", title: '"新刊『細雪』" / X',
+                     links: [ [ "https://t.co/abc", "amazon.co.jp/dp/41010…" ] ].to_json)
+
+    assert_select ".candidates a[href=?]", new_book_path(subject: { title: "細雪", isbn: "9784101005058",
+                                                                    url: "https://www.amazon.co.jp/dp/4101005052" },
+                                                         source_url: "https://x.com/someone/status/1")
+  ensure
+    ShortLink.define_singleton_method(:expand_all, original)
+  end
+
   test "文字を選んで押したら、それを名前にし、ページは出どころにする (ページの画像は付けない)" do
     capture_blog(selection: "  細雪  ")
 
