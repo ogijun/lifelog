@@ -22,7 +22,7 @@ Rails 8.1 / Hotwire (importmap) / SQLite。
 ## コマンド
 
 ```sh
-bin/rails test      # 194件, 1秒未満
+bin/rails test      # 203件, 1秒未満
 bin/rubocop
 bin/rails db:reset  # 再作成 + seed (連鎖の実例が入る)
 bin/rails server
@@ -32,6 +32,7 @@ bin/rails server
 
 - **public リポジトリ。** 運用で溜まった実データを seed / fixture / テストに入れないこと。
 - 外部 API 連携は未実装。入れるときは `subjects.external_ids` (JSON) に格納する。
-- **外部から画像を取るのは `RemoteImage` だけ。** SSRF 対策 (内部アドレスの拒否、解決した IP への直接接続、
-  リダイレクトを追わない、上限) が入っている。別の経路で `Net::HTTP` や `open-uri` を使わない。
+- **外部への接続は `SafeHttp` を通す。** SSRF 対策 (内部アドレスの拒否、解決した IP への直接接続、
+  プロキシを使わない、タイムアウト) が入っている。使っているのは `RemoteImage` (画像の取り込み) と
+  `ShortLink` (決めた短縮 URL のホストの Location を読むだけ) だけ。別の経路で `Net::HTTP` や `open-uri` を使わない。
 - 画像 (`Subject#cover`) は Active Storage の抽象だけを使う。ローカルのファイルパスに依存しない (保存先を後で変えるため)。
