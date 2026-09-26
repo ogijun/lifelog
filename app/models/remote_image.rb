@@ -16,7 +16,7 @@ module RemoteImage
 
   module_function
 
-  def fetch(url, resolver: Resolv.method(:getaddresses), http: method(:get))
+  def fetch(url, resolver: SafeHttp.method(:resolve), http: method(:get))
     uri = SafeHttp.parse(url)
     body = http.call(uri, SafeHttp.public_address(uri.host, resolver))
     content_type = Marcel::MimeType.for(StringIO.new(body))

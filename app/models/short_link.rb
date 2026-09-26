@@ -17,13 +17,15 @@ module ShortLink
   end
 
   # 行き先の URL。短縮 URL でない・分からないときは nil。
-  def expand(url, resolver: Resolv.method(:getaddresses), http: method(:get))
+  def expand(url, resolver: SafeHttp.method(:resolve), http: method(:get))
     return unless short?(url)
 
     uri = SafeHttp.parse(url)
     long = http.call(uri, SafeHttp.public_address(uri.host, resolver))
     long if HttpUrl.valid?(long)
-  rescue SafeHttp::Refused
+  rescue StandardError => e
+    # 1件の失敗 (名前解決のエラーや変な応答など) で、キャプチャの画面ごと落とさない。
+    Rails.logger.info("ShortLink could not expand #{url}: #{e.class}: #{e.message}")
     nil
   end
 
@@ -31,7 +33,7 @@ module ShortLink
   def expand_all(urls, expand: method(:expand))
     urls.select { short?(it) }.uniq.first(MAX)
         .map { |url| Thread.new { [ url, expand.call(url) ] } }
-        .filter_map { |thread| thread.value if thread.value.last }.to_h
+        .map(&:value).select(&:last).to_h
   end
 
   def get(uri, ip) = SafeHttp.get(uri, ip, timeout: TIMEOUT) { location(it) }
