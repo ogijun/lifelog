@@ -59,17 +59,36 @@ class CaptureTest < ActiveSupport::TestCase
                    "https://www.youtube.com/watch?v=dQw4w9WgXcQ" ], candidates.map { it.subject[:url] }
   end
 
-  test "名前の取れない候補には、選んだ文字かページのタイトルにある最初の『』を名前にする" do
+  test "名前の取れない本の候補には、『』の中身を名前にする" do
     links = Capture.links_from([ [ "https://t.co/x", "https://amazon.co.jp/dp/4101005052" ],
                                  [ "https://youtu.be/dQw4w9WgXcQ", "紹介動画" ] ].to_json)
-    candidates = Capture.candidates(links, hint: "新刊『細雪 上巻』の情報を公開しました")
+    candidates = Capture.candidates(links, names: { "book" => Capture.bracketed("新刊『細雪 上巻』の情報を公開しました") })
 
     assert_equal [ "細雪 上巻", "紹介動画" ], candidates.map { it.subject[:title] }
   end
 
   test "『』を名前に使うのは本の候補だけ" do
     links = Capture.links_from([ [ "https://youtu.be/dQw4w9WgXcQ", "" ] ].to_json)
-    assert_equal "", Capture.candidates(links, hint: "『本物』の味").sole.subject[:title]
+    assert_equal "", Capture.candidates(links, names: { "book" => Capture.bracketed("『本物』の味") }).sole.subject[:title]
+  end
+
+  test "SNS のプロフィールのページなら、タイトルの「名前 (@id)」から名前を取る" do
+    { [ "https://x.com/honkbooks", "(2) コ本や honkbooks (@honkbooks) / X" ] => "コ本や honkbooks",
+      [ "https://www.threads.com/@someone", "喫茶 猫屋敷 (@someone) • Threads, Say more" ] => "喫茶 猫屋敷",
+      [ "https://www.instagram.com/someone/", "喫茶 猫屋敷 (@someone) • Instagram photos and videos" ] => "喫茶 猫屋敷" }.each do |(url, title), name|
+      assert_equal name, Capture.profile_name(url:, title:), url
+    end
+    assert_nil Capture.profile_name(url: "https://x.com/honkbooks/status/1", title: "コ本や (@honkbooks) / X")
+    assert_nil Capture.profile_name(url: "https://x.com/home", title: "Home / X")
+    assert_nil Capture.profile_name(url: "https://example.com/honkbooks", title: "コ本や (@honkbooks)")
+  end
+
+  test "名前の取れない候補には、種類ごとの名前を入れる" do
+    links = Capture.links_from([ [ "https://www.google.com/maps/search/?api=1&query=#{CGI.escape('東京都新宿区神楽坂1-2-3')}", "" ],
+                                 [ "https://t.co/x", "https://amazon.co.jp/dp/4101005052" ] ].to_json)
+    candidates = Capture.candidates(links, names: { "place" => "コ本や honkbooks", "book" => "細雪" })
+
+    assert_equal [ [ "place", "コ本や honkbooks" ], [ "book", "細雪" ] ], candidates.map { [ it.kind, it.subject[:title] ] }
   end
 
   test "『』の中を取り出す" do
