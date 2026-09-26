@@ -6,6 +6,9 @@
   <span class="type type-<%= event.type %>"><%= type_label(event.type, event.subject.kind) %></span>
   <%= rating_stars(event.rating) %>
   <% if event.subject.creator.present? %><span class="creator"><%= event.subject.creator %></span><% end %>
+  <% if event.source_url %>
+    <span class="source">出どころ: <%= external_link(event.source_url) %></span>
+  <% end %>
   <% if event.cause %>
     <span class="cause">← <%= link_to event.cause.subject.title, event.cause.subject %> から</span>
   <% end %>

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "ar_internal_metadata" ("key" varchar NOT NULL PRIMAR
 CREATE TABLE IF NOT EXISTS "subjects" ("id" varchar NOT NULL PRIMARY KEY, "kind" varchar NOT NULL, "title" varchar NOT NULL, "creator" varchar, "external_ids" text, "lat" float, "lng" float, "created_at" datetime(6) NOT NULL);
 CREATE INDEX "index_subjects_on_kind" ON "subjects" ("kind") /*application='Lifelog'*/;
 CREATE INDEX "index_subjects_on_lat_and_lng" ON "subjects" ("lat", "lng") /*application='Lifelog'*/;
-CREATE TABLE IF NOT EXISTS "events" ("id" varchar NOT NULL PRIMARY KEY, "subject_id" varchar NOT NULL, "type" varchar NOT NULL, "occurred_on" varchar, "rating" integer, "note" text, "caused_by" varchar, "created_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_5feeb690e9"
+CREATE TABLE IF NOT EXISTS "events" ("id" varchar NOT NULL PRIMARY KEY, "subject_id" varchar NOT NULL, "type" varchar NOT NULL, "occurred_on" varchar, "rating" integer, "note" text, "caused_by" varchar, "created_at" datetime(6) NOT NULL, "source_url" varchar /*application='Lifelog'*/, CONSTRAINT "fk_rails_5feeb690e9"
 FOREIGN KEY ("caused_by")
   REFERENCES "events" ("id")
 , CONSTRAINT "fk_rails_635245fc67"
@@ -36,6 +36,7 @@ FOREIGN KEY ("blob_id")
 );
 CREATE UNIQUE INDEX "index_active_storage_variant_records_uniqueness" ON "active_storage_variant_records" ("blob_id", "variation_digest") /*application='Lifelog'*/;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260926000001'),
 ('20260925032621'),
 ('20260925000002'),
 ('20260925000001'),
