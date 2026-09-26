@@ -3,9 +3,10 @@
 # - ページそのものを認識できたら、値を埋めたフォームへ飛ばす
 # - できなければ、ページ内のリンクのうち認識できるものを候補に出し、種類も選ばせる
 #
-# ページの扱い: 文字を選んで押したか、リンクから候補を選んだなら、ページは何かを紹介している側なので
-# イベントの「出どころ」にする。何も選ばずに押したなら、ページそのもの (店の公式サイトなど) かもしれないので
-# 対象の URL にする。ページの og:image はページそのものを対象にするときだけ引き継ぐ。
+# ページの扱い: 文字を選んで押した、SNS の投稿、og:type が article、リンクから候補を選んだ、のどれかなら、
+# ページは何かを紹介している側なのでイベントの「出どころ」にする。そうでなければページそのもの
+# (店の公式サイトなど) かもしれないので対象の URL にする。ページの og:image はどちらでも画像の候補に出す
+# (SNS の投稿の写真は、たいていその店や料理)。フォームのチェックで外せる。
 # 認識器が画像を決めていればそちらを優先する (SPA ではページの og:image が古いまま残るため)。
 class CapturesController < ApplicationController
   helper_method :choice_params
@@ -21,14 +22,17 @@ class CapturesController < ApplicationController
     @candidates = Capture.candidates(Capture.links_from(params[:links]), hint: "#{@selection} #{@title}",
                                                                          expand: ShortLink.method(:expand_all))
     @name = @selection.presence || Capture.fallback_title(@title)
+    @source = @selection.present? || Capture.source_page?(url: @url, og_type: params[:type].to_s)
   end
 
   private
 
   # 種類を選んだときにフォームへ渡す値。url_key は対象の URL を入れる欄 (料理だけ recipe_url)。
-  def choice_params(url_key)
-    return { subject: { title: @name }, source_url: @url } if @selection.present?
+  # ページが出どころなら、名前は選んだ文字だけ (本は『』も)。投稿の本文まるごとは名前にしない。
+  def choice_params(kind, url_key)
+    return { subject: { title: @name, url_key => @url, **@image } } unless @source
 
-    { subject: { title: @name, url_key => @url, **@image } }
+    title = @selection.presence || (kind == :book ? Capture.bracketed(@title).to_s : "")
+    { subject: { title:, **@image }, source_url: @url }
   end
 end

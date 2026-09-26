@@ -19,9 +19,9 @@
 <% end %>
 
 <ul class="kind-choice">
-  <li><%= link_to "本", new_book_path(choice_params(:url)) %></li>
-  <li><%= link_to "映画", new_film_path(choice_params(:url)) %></li>
-  <li><%= link_to "料理", new_dish_path(choice_params(:recipe_url)) %></li>
-  <li><%= link_to "店", new_place_path(choice_params(:url)) %></li>
-  <li><%= link_to "動画", new_video_path(choice_params(:url)) %></li>
+  <li><%= link_to "本", new_book_path(choice_params(:book, :url)) %></li>
+  <li><%= link_to "映画", new_film_path(choice_params(:film, :url)) %></li>
+  <li><%= link_to "料理", new_dish_path(choice_params(:dish, :recipe_url)) %></li>
+  <li><%= link_to "店", new_place_path(choice_params(:place, :url)) %></li>
+  <li><%= link_to "動画", new_video_path(choice_params(:video, :url)) %></li>
 </ul>

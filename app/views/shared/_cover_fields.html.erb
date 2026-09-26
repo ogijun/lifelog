@@ -1,9 +1,10 @@
-<%# 対象の顔になる画像。capture で来た画像はプレビューを出し、記録したときに取り込む。locals: image_url: %>
+<%# 対象の顔になる画像。capture で来た画像はプレビューを出し、チェックが入っていれば記録したときに取り込む。locals: image_url: %>
 <% if image_url.present? && HttpUrl.valid?(image_url) %>
   <figure class="cover-preview">
     <%= image_tag image_url, alt: "", referrerpolicy: "no-referrer" %>
-    <figcaption>記録するとこの画像を取り込む</figcaption>
+    <figcaption>
+      <label class="cover-take"><%= check_box_tag "subject[image_url]", image_url, true, id: nil %>この画像を取り込む</label>
+    </figcaption>
   </figure>
-  <%= hidden_field_tag "subject[image_url]", image_url %>
 <% end %>
 <label>画像 <small>ファイルを選ぶとこちらを優先</small><%= file_field_tag "subject[cover]", accept: Subject::COVER_TYPES.join(",") %></label>

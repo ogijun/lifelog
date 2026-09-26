@@ -7,6 +7,8 @@ module Capture
   # ブックマークレットが送るページ内のリンク (行き先と、リンクの文字)。
   Link = Data.define(:href, :text)
   MAX_LINKS = 300
+  # 何かを紹介する側のページ (SNS の投稿)。投稿そのものを記録することはまず無いので、出どころにする。
+  SOURCE_HOSTS = %w[threads.com threads.net x.com twitter.com instagram.com facebook.com bsky.app tiktok.com].freeze
   # Netflix の日本語タイトルなどに混ざるゼロ幅の文字。
   ZERO_WIDTH = /[\u200B-\u200D\u2060\uFEFF]/
 
@@ -47,7 +49,9 @@ module Capture
     end
     name = bracketed(hint)
     hits.uniq { it.subject[:url] }.map do |hit|
-      hit.subject[:title].present? || name.nil? ? hit : hit.with(subject: hit.subject.merge(title: name))
+      next hit if hit.kind != "book" || hit.subject[:title].present? || name.nil?
+
+      hit.with(subject: hit.subject.merge(title: name))
     end
   end
 
@@ -70,7 +74,16 @@ module Capture
     url if HttpUrl.valid?(url) && URI(url).host.include?(".")
   end
 
+  # ページが何かを紹介する側 (出どころ) か。SNS の投稿か、og:type が article (ブログや記事) なら。
+  # そうでなければページそのもの (店の公式サイトなど) かもしれない。
+  def source_page?(url:, og_type:)
+    og_type == "article" || (host = URI.parse(url.to_s).host) && SOURCE_HOSTS.any? { host == it || host.end_with?(".#{it}") }
+  rescue URI::InvalidURIError
+    false
+  end
+
   # 日本語の書名は『』で囲まれることが多い。最初の『』の中身。
+  # 『本物』のような強調にも使われるので、名前にするのは本のときだけ。
   def bracketed(text) = text.to_s[/『([^』]+)』/, 1]
 
   # 種類を選ばせるときに引き継ぐ名前。サイト名の接尾辞だけ外す。
