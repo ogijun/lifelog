@@ -1,8 +1,14 @@
-<%# 精度可変の日付 (FuzzyDate)。分からない欄は空のまま。年が空なら日付不明。locals: value:, legend: ("日付") %>
-<% parts = FuzzyDate.parts(value) %>
-<fieldset class="fuzzy-date">
-  <legend><%= local_assigns.fetch(:legend, "日付") %> <small>分からない欄は空のまま</small></legend>
-  <%= number_field_tag "event[occurred_year]", parts[:year], placeholder: "年", min: 1, max: 9999, "aria-label": "年" %>
-  <%= number_field_tag "event[occurred_month]", parts[:month], placeholder: "月", min: 1, max: 12, "aria-label": "月" %>
-  <%= number_field_tag "event[occurred_day]", parts[:day], placeholder: "日", min: 1, max: 31, "aria-label": "日" %>
-</fieldset>
+<%# 日付。1つの欄に書いたものを FuzzyDate.parse で読む。空なら不明。locals: value:, legend: ("日付") %>
+<div class="fuzzy-date" data-controller="fuzzy-date" data-fuzzy-date-url-value="<%= fuzzy_date_path %>">
+  <label><%= local_assigns.fetch(:legend, "日付") %>
+    <small>2026/9/25・2026/9・2026・9/25・今日・去年 など。空なら不明</small>
+    <%= text_field_tag "event[occurred_on]", FuzzyDate.input_value(value), autocomplete: "off",
+          data: { fuzzy_date_target: "input", action: "input->fuzzy-date#preview" } %>
+  </label>
+  <span class="quick-dates">
+    <% [ [ "今日", "今日" ], [ "昨日", "昨日" ], [ "不明", "" ] ].each do |label, text| %>
+      <button type="button" data-action="fuzzy-date#fill" data-fuzzy-date-text-param="<%= text %>"><%= label %></button>
+    <% end %>
+    <output data-fuzzy-date-target="preview"></output>
+  </span>
+</div>
