@@ -67,6 +67,10 @@ class RemoteImageTest < ActiveSupport::TestCase
     assert_raises(RemoteImage::Refused) { fetch("https://img.example.com/a.png", ips: [ PUBLIC_IP, "127.0.0.1" ]) }
   end
 
+  test "SafeHttp.resolve は hosts と DNS で名前解決する" do
+    assert_includes SafeHttp.resolve("localhost").map(&:to_s), "127.0.0.1"
+  end
+
   test "名前解決できなければ拒否" do
     assert_raises(RemoteImage::Refused) { fetch("https://nowhere.invalid/a.png", ips: []) }
   end
