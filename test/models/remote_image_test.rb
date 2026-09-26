@@ -56,7 +56,7 @@ class RemoteImageTest < ActiveSupport::TestCase
     original = ENV.values_at("http_proxy", "https_proxy")
     ENV["http_proxy"] = ENV["https_proxy"] = "http://proxy.example.com:3128"
 
-    http = RemoteImage.connection(URI("https://img.example.com/a.png"), PUBLIC_IP)
+    http = SafeHttp.connection(URI("https://img.example.com/a.png"), PUBLIC_IP)
     assert_not http.proxy?
     assert_equal PUBLIC_IP, http.ipaddr
   ensure
