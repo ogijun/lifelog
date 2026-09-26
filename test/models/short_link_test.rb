@@ -48,6 +48,12 @@ class ShortLinkTest < ActiveSupport::TestCase
     assert_nil expand("https://t.co/abc", location: "javascript:alert(1)").first
   end
 
+  test "解決の途中で想定外の例外が起きても、その1件を諦めるだけ (画面を落とさない)" do
+    boom = ->(_uri, _ip) { raise Resolv::ResolvError, "dns" }
+    assert_nil ShortLink.expand("https://t.co/abc", resolver: resolver(PUBLIC_IP), http: boom)
+    assert_nil ShortLink.expand("https://t.co/abc", resolver: ->(_) { raise Encoding::CompatibilityError }, http: http(nil).first)
+  end
+
   test "Location は応答がリダイレクトのときだけ読む" do
     redirect = Net::HTTPMovedPermanently.new("1.1", "301", "Moved")
     redirect["location"] = "https://www.amazon.co.jp/dp/4101005052"
