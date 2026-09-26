@@ -146,10 +146,11 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     ShortLink.define_singleton_method(:expand_all, original)
   end
 
-  test "文字を選んで押したら、それを名前にし、ページは出どころにする (ページの画像は付けない)" do
+  test "文字を選んで押したら、それを名前にし、ページは出どころにする (ページの画像は候補に出す)" do
     capture_blog(selection: "  細雪  ")
 
-    assert_select ".kind-choice a[href=?]", new_book_path(subject: { title: "細雪" }, source_url: BLOG)
+    assert_select ".kind-choice a[href=?]", new_book_path(subject: { title: "細雪", image_url: "https://blog.example.com/header.png" },
+                                                          source_url: BLOG)
   end
 
   test "何も選ばずリンクからも見つからなければ、今までどおりページそのものを対象にする" do
@@ -158,6 +159,35 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     assert_select ".candidates", 0
     assert_select ".kind-choice a[href=?]", new_book_path(subject: { title: "今月読んだ本 | ある日のブログ", url: BLOG,
                                                                      image_url: "https://blog.example.com/header.png" })
+  end
+
+  THREADS = "https://www.threads.com/@someone/post/Abc123".freeze
+
+  test "SNS の投稿は、文字を選んでいなくても出どころにし、名前は空欄、投稿の画像は候補に出す" do
+    get capture_path(url: THREADS, title: "大森駅前にビストロがオープンしていた。『本物』のお味。",
+                     image: "https://cdn.example.com/post.jpg")
+
+    assert_select ".kind-choice a[href=?]", new_place_path(subject: { title: "", image_url: "https://cdn.example.com/post.jpg" },
+                                                           source_url: THREADS)
+  end
+
+  test "og:type が article のページも出どころにする。website なら今までどおりページそのもの" do
+    get capture_path(url: BLOG, title: "ある日のブログ", type: "article")
+    assert_select ".kind-choice a[href=?]", new_place_path(subject: { title: "" }, source_url: BLOG)
+
+    get capture_path(url: "https://bistro.example.com/", title: "ビストロ", type: "website")
+    assert_select ".kind-choice a[href=?]", new_place_path(subject: { title: "ビストロ", url: "https://bistro.example.com/" })
+  end
+
+  test "出どころにしたとき、『』を名前に使うのは本だけ" do
+    get capture_path(url: THREADS, title: "新刊『細雪』を読んだ")
+    assert_select ".kind-choice a[href=?]", new_book_path(subject: { title: "細雪" }, source_url: THREADS)
+    assert_select ".kind-choice a[href=?]", new_place_path(subject: { title: "" }, source_url: THREADS)
+  end
+
+  test "ブックマークレットは og:type も送る" do
+    get bookmarklet_path
+    assert_includes css_select("a[href^='javascript:']").sole["href"], "&type="
   end
 
   test "リンクの JSON が壊れていても落ちない" do
