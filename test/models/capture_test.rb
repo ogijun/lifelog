@@ -33,6 +33,29 @@ class CaptureTest < ActiveSupport::TestCase
     assert_equal "9784101005058", candidates.first.subject[:isbn]
   end
 
+  test "行き先が短縮 URL (X の t.co など) でも、リンクの文字が URL ならそれで判定する" do
+    links = Capture.links_from([ [ "https://t.co/xTpSKCcmAO", "https://amazon.co.jp/dp/4101005052" ],
+                                 [ "https://t.co/abc", "amazon.co.jp/dp/4041022093" ],
+                                 [ "https://t.co/def", "amazon.co.jp/dp/48144…" ] ].to_json)
+
+    assert_equal [ "https://www.amazon.co.jp/dp/4101005052", "https://www.amazon.co.jp/dp/4041022093" ],
+                 Capture.candidates(links).map { it.subject[:url] }
+  end
+
+  test "名前の取れない候補には、選んだ文字かページのタイトルにある最初の『』を名前にする" do
+    links = Capture.links_from([ [ "https://t.co/x", "https://amazon.co.jp/dp/4101005052" ],
+                                 [ "https://youtu.be/dQw4w9WgXcQ", "紹介動画" ] ].to_json)
+    candidates = Capture.candidates(links, hint: "新刊『細雪 上巻』の情報を公開しました")
+
+    assert_equal [ "細雪 上巻", "紹介動画" ], candidates.map { it.subject[:title] }
+  end
+
+  test "『』の中を取り出す" do
+    assert_equal "細雪 上巻", Capture.bracketed("新刊『細雪 上巻』と『鍵』")
+    assert_nil Capture.bracketed("括弧なし")
+    assert_nil Capture.bracketed(nil)
+  end
+
   test "種類を選ばせるときの名前からは Wikipedia の接尾辞を外す" do
     assert_equal "細雪", Capture.fallback_title("細雪 - Wikipedia")
     assert_equal "何かのページ", Capture.fallback_title("何かのページ")
