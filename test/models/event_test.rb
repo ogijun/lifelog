@@ -43,6 +43,19 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 5, e.reload.rating
   end
 
+  test "出どころ (source_url) は空か http(s) の URL" do
+    s = subject!
+    assert Event.new(subject: s, type: "wished", occurred_on: "2026", source_url: nil).valid?
+    assert Event.new(subject: s, type: "wished", occurred_on: "2026", source_url: "https://blog.example.com/p/1").valid?
+    e = Event.new(subject: s, type: "wished", occurred_on: "2026", source_url: "javascript:alert(1)")
+    assert_not e.valid?
+    assert_includes e.errors[:source_url], "は http(s) の URL にしてください"
+  end
+
+  test "出どころの空文字は nil にする" do
+    assert_nil Event.create!(subject: subject!, type: "wished", occurred_on: "2026", source_url: "").source_url
+  end
+
   test "type は wished / did / dropped のみ" do
     e = Event.new(subject: subject!, type: "started", occurred_on: Date.new(2026, 1, 1))
     assert_not e.valid?
