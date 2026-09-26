@@ -28,6 +28,14 @@ module SafeHttp
 
   module_function
 
+  # 名前解決。Resolv.getaddresses は DNS に上限時間が無いので、hosts と上限時間付きの DNS を使う。
+  def resolve(host)
+    dns = Resolv::DNS.new.tap { it.timeouts = TIMEOUT }
+    Resolv.new([ Resolv::Hosts.new, dns ]).getaddresses(host)
+  ensure
+    dns&.close
+  end
+
   def parse(url)
     uri = URI.parse(url.to_s)
     raise Refused, "http(s) ではない" unless uri.is_a?(URI::HTTP) && uri.host.present?
