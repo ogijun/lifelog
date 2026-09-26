@@ -36,7 +36,7 @@ module ApplicationHelper
 
   # 外部 ID の値。http(s) の URL だけ別タブのリンクにする (javascript: などはリンクにしない)。
   def external_link(value)
-    return value unless RemoteImage.http_url?(value)
+    return value unless HttpUrl.valid?(value)
 
     link_to value, value, target: "_blank", rel: "noopener noreferrer"
   end

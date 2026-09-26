@@ -6,7 +6,7 @@ class CapturesController < ApplicationController
   def show
     @url = params[:url].to_s
     @title = params[:title].to_s
-    @image = { image_url: params[:image] }.select { |_, url| RemoteImage.http_url?(url) }
+    @image = { image_url: params[:image] }.select { |_, url| HttpUrl.valid?(url) }
     hit = Capture.recognize(url: @url, title: @title)
     return redirect_to public_send("new_#{hit.kind}_path", subject: @image.merge(hit.subject)) if hit
 
