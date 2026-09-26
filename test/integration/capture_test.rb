@@ -91,6 +91,13 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_dish_path(subject: { title: "何かのページ", recipe_url: "https://example.com/x", image_url: image })
   end
 
+  test "認識器が決めた画像はページの og:image より優先する (YouTube はサイト内移動で og:image がロゴのまま残る)" do
+    get capture_path(url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", title: "細雪を読む - YouTube",
+                     image: "https://www.youtube.com/img/desktop/yt_1200.png")
+    assert_redirected_to new_video_path(subject: { title: "細雪を読む", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                                                   image_url: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" })
+  end
+
   test "画像が無い・http(s) でないときは引き継がない" do
     get capture_path(url: MAPS_URL, title: "芦屋の割烹 - Google マップ", image: "")
     assert_redirected_to new_place_path(subject: { title: "芦屋の割烹", lat: "34.7275", lng: "135.305", url: MAPS_URL })
