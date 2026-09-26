@@ -34,6 +34,13 @@ module ApplicationHelper
     "#{distance_of_time_in_words(Date.iso8601(as_of), Date.current)} 前から"
   end
 
+  # 外部 ID の値。http(s) の URL だけ別タブのリンクにする (javascript: などはリンクにしない)。
+  def external_link(value)
+    return value unless RemoteImage.http_url?(value)
+
+    link_to value, value, target: "_blank", rel: "noopener noreferrer"
+  end
+
   # 対象の顔になる画像。無ければ何も出さない。
   def cover_image(subject, css)
     return unless subject.cover.attached?
