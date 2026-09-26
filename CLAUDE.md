@@ -22,7 +22,7 @@ Rails 8.1 / Hotwire (importmap) / SQLite。
 ## コマンド
 
 ```sh
-bin/rails test      # 203件, 1秒未満
+bin/rails test      # 205件, 1秒未満
 bin/rubocop
 bin/rails db:reset  # 再作成 + seed (連鎖の実例が入る)
 bin/rails server
