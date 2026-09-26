@@ -73,7 +73,16 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     get bookmarklet_path
 
     assert_response :success
-    assert_select "a[href^='javascript:'][href*=?]", "#{capture_url}?url="
+    assert_select "a[href^='javascript:'][href*=?]", "#{capture_url.to_json} + \"?url=\""
+  end
+
+  test "ブックマークレットは選んだ文字とページ内のリンクも送り、改行を含まない1行になっている" do
+    get bookmarklet_path
+    href = css_select("a[href^='javascript:']").sole["href"]
+
+    assert_includes href, "&selection="
+    assert_includes href, "&links="
+    assert_no_match(/\n/, href)
   end
 
   test "ブックマークレットはページの og:image も送る" do
