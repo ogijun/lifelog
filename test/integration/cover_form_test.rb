@@ -36,7 +36,7 @@ class CoverFormTest < ActionDispatch::IntegrationTest
   test "capture で来た画像はプレビューが出て、記録すると取り込む" do
     get new_video_path(subject: { title: "細雪を読む", image_url: "https://img.example.com/a.jpg" })
     assert_select "img[src='https://img.example.com/a.jpg']"
-    assert_select "input[type=hidden][name='subject[image_url]'][value='https://img.example.com/a.jpg']"
+    assert_select "input[type=checkbox][name='subject[image_url]'][value='https://img.example.com/a.jpg'][checked]"
 
     with_remote_image do
       post videos_path, params: { subject: { title: "細雪を読む", image_url: "https://img.example.com/a.jpg" }, event: EVENT }
