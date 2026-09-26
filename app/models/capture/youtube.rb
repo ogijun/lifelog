@@ -1,5 +1,8 @@
 # YouTube の動画ページ。動画そのものも体験の対象なので「動画」として記録する
 # (紹介された本を「読みたい」へのきっかけにできる)。チャンネル名はタイトルに無いので取れない。
+# サムネイルは動画 ID から決める。YouTube はサイト内を移動しても og:image が最初のページ
+# (トップならロゴ) のまま残るので、ページから送られてくる画像は当てにならない。
+# hqdefault はどの動画にもある (maxresdefault は無い動画がある)。
 module Capture
   module Youtube
     WATCH = %r{\Ahttps://(?:www\.|m\.)?youtube\.com/watch\?(?:[^#]*&)?v=([\w-]{11})}
@@ -12,7 +15,8 @@ module Capture
     def call(url:, title:)
       video = WATCH.match(url) || SHORT.match(url) or return
       name = title.delete_suffix(" - YouTube").sub(NOTIFICATIONS, "")
-      Hit.new(kind: "video", subject: { title: name, url: "https://www.youtube.com/watch?v=#{video[1]}" })
+      Hit.new(kind: "video", subject: { title: name, url: "https://www.youtube.com/watch?v=#{video[1]}",
+                                        image_url: "https://i.ytimg.com/vi/#{video[1]}/hqdefault.jpg" })
     end
   end
 end
