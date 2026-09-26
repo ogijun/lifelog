@@ -19,8 +19,10 @@ class CapturesController < ApplicationController
     return redirect_to public_send("new_#{hit.kind}_path", subject: @image.merge(hit.subject)) if hit
 
     @selection = params[:selection].to_s.squish.first(200)
-    @candidates = Capture.candidates(Capture.links_from(params[:links]), hint: "#{@selection} #{@title}",
-                                                                         expand: ShortLink.method(:expand_all))
+    # 名前の取れない候補に入れる名前。本は『』の中身、店は SNS のプロフィールの名前。
+    @names = { "book" => Capture.bracketed("#{@selection} #{@title}"),
+               "place" => Capture.profile_name(url: @url, title: @title) }.compact
+    @candidates = Capture.candidates(Capture.links_from(params[:links]), names: @names, expand: ShortLink.method(:expand_all))
     @name = @selection.presence || Capture.fallback_title(@title)
     @source = @selection.present? || Capture.source_page?(url: @url, og_type: params[:type].to_s)
   end
@@ -28,11 +30,12 @@ class CapturesController < ApplicationController
   private
 
   # 種類を選んだときにフォームへ渡す値。url_key は対象の URL を入れる欄 (料理だけ recipe_url)。
-  # ページが出どころなら、名前は選んだ文字だけ (本は『』も)。投稿の本文まるごとは名前にしない。
+  # ページが出どころなら、名前は選んだ文字か、種類ごとの名前 (本は『』、店はプロフィールの名前)。
+  # 投稿の本文まるごとは名前にしない。
   def choice_params(kind, url_key)
     return { subject: { title: @name, url_key => @url, **@image } } unless @source
 
-    title = @selection.presence || (kind == :book ? Capture.bracketed(@title).to_s : "")
+    title = @selection.presence || @names[kind.to_s].to_s
     { subject: { title:, **@image }, source_url: @url }
   end
 end

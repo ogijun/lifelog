@@ -41,6 +41,16 @@ module ApplicationHelper
     link_to value, value, target: "_blank", rel: "noopener noreferrer"
   end
 
+  # Google マップで探すリンク (名前や住所で検索する)。地図で店を開いてブックマークレットを押し直せば、
+  # 店名と座標まで入る。
+  def maps_search_link(*terms)
+    query = terms.compact_blank.join(" ")
+    return if query.empty?
+
+    link_to "Google マップで探す", "https://www.google.com/maps/search/?api=1&query=#{CGI.escape(query)}",
+            target: "_blank", rel: "noopener noreferrer", class: "maps-search"
+  end
+
   # 対象の顔になる画像。無ければ何も出さない。
   def cover_image(subject, css)
     return unless subject.cover.attached?

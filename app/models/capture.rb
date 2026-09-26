@@ -9,14 +9,20 @@ module Capture
   MAX_LINKS = 300
   # 何かを紹介する側のページ (SNS の投稿)。投稿そのものを記録することはまず無いので、出どころにする。
   SOURCE_HOSTS = %w[threads.com threads.net x.com twitter.com instagram.com facebook.com bsky.app tiktok.com].freeze
+  # SNS のプロフィールのページ (投稿ではなくアカウント)。アカウント自体が店などであることが多い。
+  PROFILES = [
+    %r{\Ahttps://(?:www\.)?(?:x|twitter)\.com/(?!home\b|explore\b|search\b|i/|settings\b|notifications\b|messages\b)\w+/?\z},
+    %r{\Ahttps://(?:www\.)?threads\.(?:com|net)/@[\w.]+/?\z},
+    %r{\Ahttps://(?:www\.)?instagram\.com/(?!p/|reel/|explore/)[\w.]+/?\z}
+  ].freeze
   # Netflix の日本語タイトルなどに混ざるゼロ幅の文字。
   ZERO_WIDTH = /[\u200B-\u200D\u2060\uFEFF]/
 
   module_function
 
   # PrimeVideo は amazon.co.jp の /dp/ で本 (Amazon) と形が重なるので先に置く。
-  def recognizers = [ GoogleMaps, GoogleSearch, Tabelog, PrimeVideo, Amazon, Imdb, Wikipedia, Kyounoryouri,
-                      Youtube, Netflix, DisneyPlus ]
+  def recognizers = [ GoogleMaps, GoogleMapsSearch, GoogleSearch, Tabelog, PrimeVideo, Amazon, Imdb, Wikipedia,
+                      Kyounoryouri, Youtube, Netflix, DisneyPlus ]
 
   def recognize(url:, title:)
     title = title.to_s.gsub(ZERO_WIDTH, "")
@@ -37,19 +43,19 @@ module Capture
 
   # ページ内のリンクのうち、認識器が分かるものを候補にする (LLM を使わないパターンマッチ)。
   # ブックマークレットが「選んだ範囲 → 本文 → その他」の順に送るので、その順を保つ。
-  # 名前の取れなかった候補には、hint (選んだ文字やページのタイトル) にある最初の『』を名前にする。
+  # 名前の取れなかった候補には、names (種類 => 名前) の名前を入れる (本なら『』の中身、店ならプロフィールの名前)。
   #
   # 行き先でもリンクの文字でも分からなかったリンクは expand (URL の配列 -> { URL => 行き先 }) に渡し、
   # 行き先が分かればそれで判定する。短縮 URL の解決は通信を伴うので外から渡す (ShortLink.expand_all)。
-  def candidates(links, hint: nil, expand: ->(_urls) { {} })
+  def candidates(links, names: {}, expand: ->(_urls) { {} })
     first = links.map { [ it, recognize_link(it) ] }
     expanded = expand.call(first.filter_map { |link, hit| link.href unless hit })
     hits = first.filter_map do |link, hit|
       hit || (long = expanded[link.href]) && recognize(url: long, title: link_name(link.text))
     end
-    name = bracketed(hint)
     hits.uniq { it.subject[:url] }.map do |hit|
-      next hit if hit.kind != "book" || hit.subject[:title].present? || name.nil?
+      name = names[hit.kind]
+      next hit if hit.subject[:title].present? || name.blank?
 
       hit.with(subject: hit.subject.merge(title: name))
     end
@@ -80,6 +86,13 @@ module Capture
     og_type == "article" || (host = URI.parse(url.to_s).host) && SOURCE_HOSTS.any? { host == it || host.end_with?(".#{it}") }
   rescue URI::InvalidURIError
     false
+  end
+
+  # SNS のプロフィールのページなら、タイトルの「名前 (@id)」の名前。未読の件数「(2) 」は外す。
+  def profile_name(url:, title:)
+    return unless PROFILES.any? { it.match?(url.to_s) }
+
+    title.to_s[/\A(?:\(\d+\) )?(.+?) \(@[\w.]+\)/, 1]
   end
 
   # 日本語の書名は『』で囲まれることが多い。最初の『』の中身。
