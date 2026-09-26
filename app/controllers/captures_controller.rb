@@ -18,7 +18,8 @@ class CapturesController < ApplicationController
     return redirect_to public_send("new_#{hit.kind}_path", subject: @image.merge(hit.subject)) if hit
 
     @selection = params[:selection].to_s.squish.first(200)
-    @candidates = Capture.candidates(Capture.links_from(params[:links]), hint: "#{@selection} #{@title}")
+    @candidates = Capture.candidates(Capture.links_from(params[:links]), hint: "#{@selection} #{@title}",
+                                                                         expand: ShortLink.method(:expand_all))
     @name = @selection.presence || Capture.fallback_title(@title)
   end
 
