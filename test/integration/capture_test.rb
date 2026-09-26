@@ -123,6 +123,16 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
                                                          source_url: BLOG), text: /細雪/
   end
 
+  test "X の投稿: リンクは t.co でも文字の URL で本を見つけ、名前は投稿の『』から取る" do
+    tweet = "https://x.com/someone/status/1"
+    get capture_path(url: tweet, title: 'Someone on X: "新刊『細雪 上巻』が出ます https://t.co/xTpSKCcmAO" / X',
+                     links: [ [ "https://t.co/xTpSKCcmAO", "https://amazon.co.jp/dp/4101005052" ] ].to_json)
+
+    assert_select ".candidates a[href=?]", new_book_path(subject: { title: "細雪 上巻", isbn: "9784101005058",
+                                                                    url: "https://www.amazon.co.jp/dp/4101005052" },
+                                                         source_url: tweet)
+  end
+
   test "文字を選んで押したら、それを名前にし、ページは出どころにする (ページの画像は付けない)" do
     capture_blog(selection: "  細雪  ")
 
