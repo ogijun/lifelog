@@ -190,6 +190,18 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
     assert_includes css_select("a[href^='javascript:']").sole["href"], "&type="
   end
 
+  test "X のプロフィール: 場所の検索リンクから住所を、タイトルから店名を取り、Google マップで探すリンクも出す" do
+    profile = "https://x.com/honkbooks"
+    address = "東京都新宿区神楽坂1-2-3"
+    maps = "https://www.google.com/maps/search/?api=1&query=#{CGI.escape(address)}"
+    get capture_path(url: profile, title: "(2) コ本や honkbooks (@honkbooks) / X", links: [ [ maps, "" ] ].to_json)
+
+    assert_select ".candidates a[href=?]", new_place_path(subject: { title: "コ本や honkbooks", address:, url: maps }, source_url: profile)
+    search = "https://www.google.com/maps/search/?api=1&query=#{CGI.escape("コ本や honkbooks #{address}")}"
+    assert_select ".candidates a[href=?][target=_blank]", search, text: "Google マップで探す"
+    assert_select ".kind-choice a[href=?]", new_place_path(subject: { title: "コ本や honkbooks" }, source_url: profile)
+  end
+
   test "リンクの JSON が壊れていても落ちない" do
     capture_blog(links: "{broken")
     assert_response :success
