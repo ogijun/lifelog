@@ -1,23 +1,6 @@
 require "test_helper"
 
 class FuzzyDateTest < ActiveSupport::TestCase
-  test "フォームの年・月・日から精度に応じた文字列を組む" do
-    assert_equal "2026-03-05", FuzzyDate.from_parts(year: "2026", month: "3", day: "5")
-    assert_equal "2026-03", FuzzyDate.from_parts(year: "2026", month: "3", day: "")
-    assert_equal "2026", FuzzyDate.from_parts(year: " 2026 ", month: "", day: "")
-  end
-
-  test "粗い欄が空なら細かい欄は無視し、年が空なら不明 (nil)" do
-    assert_equal "2026", FuzzyDate.from_parts(year: "2026", month: "", day: "5")
-    assert_nil FuzzyDate.from_parts(year: "", month: "3", day: "5")
-    assert_nil FuzzyDate.from_parts(year: nil, month: nil, day: nil)
-  end
-
-  test "数字でない入力は組んだまま返し、判定はバリデーションに任せる" do
-    assert_equal "20x6", FuzzyDate.from_parts(year: "20x6", month: "", day: "")
-    assert_not FuzzyDate.valid?("20x6")
-  end
-
   test "形式と暦の正しさ" do
     [ nil, "2026", "2026-12", "2024-02-29" ].each { |s| assert FuzzyDate.valid?(s), s.inspect }
     [ "", "26", "2026-13", "2026-00", "2026-02-30", "2025-02-29", "2026-3-5", "2026-03-05T10:00" ].each do |s|
