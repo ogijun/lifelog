@@ -174,3 +174,6 @@ img.thumb { width: 2.4rem; height: 2.4rem; object-fit: cover; border-radius: 3px
 .type-choice input[type="radio"] { width: auto; }
 
 .event .source { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
+
+.candidates { list-style: none; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+.candidates small { color: var(--muted); margin-left: .4rem; }
