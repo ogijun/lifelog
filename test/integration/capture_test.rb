@@ -98,6 +98,41 @@ class CaptureFlowTest < ActionDispatch::IntegrationTest
                                                    image_url: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" })
   end
 
+  BLOG = "https://blog.example.com/posts/1".freeze
+
+  def capture_blog(**params)
+    get capture_path(url: BLOG, title: "今月読んだ本 | ある日のブログ", image: "https://blog.example.com/header.png", **params)
+  end
+
+  test "ページ内のリンクから見つけたものを候補に出し、ページは出どころにする" do
+    capture_blog(links: [ [ "https://blog.example.com/about", "about" ],
+                          [ "https://www.amazon.co.jp/dp/4101005052", "細雪 (新潮文庫)" ] ].to_json)
+
+    assert_response :success
+    assert_select ".candidates a[href=?]", new_book_path(subject: { title: "細雪 (新潮文庫)", isbn: "9784101005058",
+                                                                    url: "https://www.amazon.co.jp/dp/4101005052" },
+                                                         source_url: BLOG), text: /細雪/
+  end
+
+  test "文字を選んで押したら、それを名前にし、ページは出どころにする (ページの画像は付けない)" do
+    capture_blog(selection: "  細雪  ")
+
+    assert_select ".kind-choice a[href=?]", new_book_path(subject: { title: "細雪" }, source_url: BLOG)
+  end
+
+  test "何も選ばずリンクからも見つからなければ、今までどおりページそのものを対象にする" do
+    capture_blog
+
+    assert_select ".candidates", 0
+    assert_select ".kind-choice a[href=?]", new_book_path(subject: { title: "今月読んだ本 | ある日のブログ", url: BLOG,
+                                                                     image_url: "https://blog.example.com/header.png" })
+  end
+
+  test "リンクの JSON が壊れていても落ちない" do
+    capture_blog(links: "{broken")
+    assert_response :success
+  end
+
   test "画像が無い・http(s) でないときは引き継がない" do
     get capture_path(url: MAPS_URL, title: "芦屋の割烹 - Google マップ", image: "")
     assert_redirected_to new_place_path(subject: { title: "芦屋の割烹", lat: "34.7275", lng: "135.305", url: MAPS_URL })
