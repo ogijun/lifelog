@@ -1,3 +1,5 @@
+require "resolv"
+
 # 外部の画像 (capture で送られてきた og:image など) を1枚取ってくる。
 # 接続の守り (SSRF 対策) は SafeHttp。ここではさらに:
 #
