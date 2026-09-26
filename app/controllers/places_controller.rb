@@ -24,10 +24,10 @@ class PlacesController < ApplicationController
   private
 
   def subject_params
-    p = params.expect(subject: [ :title, :creator, :lat, :lng, :google_place, :url, :cover ])
+    p = params.expect(subject: [ :title, :creator, :lat, :lng, :google_place, :url, :address, :cover ])
     { kind: "place", title: p[:title], creator: p[:creator], cover: p[:cover],
       lat: p[:lat].presence, lng: p[:lng].presence,
-      external_ids: { "google_place" => p[:google_place], "url" => p[:url] }.compact_blank }
+      external_ids: { "google_place" => p[:google_place], "url" => p[:url], "address" => p[:address] }.compact_blank }
   end
 
   def event_params
