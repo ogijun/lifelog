@@ -21,6 +21,7 @@ class ApplicationHelperTest < ActionView::TestCase
   test "したいと思ってからの期間は、日付の精度に合わせて言う" do
     travel_to Date.new(2026, 9, 25) do
       assert_equal "about 1 month 前から", wished_since("2026-08-20")
+      assert_equal "about 1 month 前から", wished_since("2026-08-20T14:30")
       assert_equal "2026年3月から", wished_since("2026-03")
       assert_equal "2025年から", wished_since("2025")
       assert_equal "いつからか分からない", wished_since(nil)
