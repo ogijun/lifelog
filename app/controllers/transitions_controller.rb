@@ -3,7 +3,7 @@
 class TransitionsController < ApplicationController
   def create
     subject = Subject.find(params[:subject_id])
-    Recorder.append(subject, type: params[:type], occurred_on: FuzzyDate.from_date(Date.current))
+    Recorder.append(subject, type: params[:type], occurred_on: FuzzyTimestamp.from_date(Date.current))
     redirect_to subject, status: :see_other
   rescue ActiveRecord::RecordInvalid => e
     redirect_to subject, status: :see_other, alert: e.record.errors.full_messages.to_sentence

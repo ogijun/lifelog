@@ -45,12 +45,12 @@ class EventsController < ApplicationController
 
   def edit_params
     p = params.expect(event: [ :occurred_on, :rating, :note, :source_url ])
-    { rating: p[:rating], note: p[:note], source_url: p[:source_url], occurred_on: FuzzyDate.parse(p[:occurred_on]) }
+    { rating: p[:rating], note: p[:note], source_url: p[:source_url], occurred_on: FuzzyTimestamp.parse(p[:occurred_on], now: Time.current) }
   end
 
   def event_params
     p = params.expect(event: [ :type, :occurred_on, :rating, :note, :caused_by, :source_url ])
     { type: p[:type], rating: p[:rating], note: p[:note], caused_by: p[:caused_by], source_url: p[:source_url],
-      occurred_on: FuzzyDate.parse(p[:occurred_on]) }
+      occurred_on: FuzzyTimestamp.parse(p[:occurred_on], now: Time.current) }
   end
 end

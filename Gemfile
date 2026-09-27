@@ -1,6 +1,9 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+
+# 精度可変の日時 ("2026" / "2026-03" / "2026-03-05" / "2026-03-05T14:30" / nil)。lifelog から独立させたもの。
+gem "fuzzy_timestamp", github: "ogijun/fuzzy_timestamp"
 gem "rails", "~> 8.1.3", ">= 8.1.3.1"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"

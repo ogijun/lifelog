@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // 日付の欄。ボタンで埋めるのと、読み取った結果の表示。
-// 読み取りの規則はサーバ (FuzzyDate.parse) にだけ置き、ここでは問い合わせて表示するだけ。
+// 読み取りの規則はサーバ (FuzzyTimestamp.parse) にだけ置き、ここでは問い合わせて表示するだけ。
 export default class extends Controller {
   static targets = ["input", "preview"]
   static values = { url: String }
