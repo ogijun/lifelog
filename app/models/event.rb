@@ -1,7 +1,7 @@
 # 遷移イベント。現在の状態はこの列の最新から導出する (current_state ビュー)。
 #
 # type だけが追記のみ。状態の変化は追記で表すので、遷移の種類は後から変更させない。
-# occurred_on (精度可変の日付、FuzzyDate) / rating / note は普通に UPDATE してよい。
+# occurred_on (精度可変の日時、FuzzyTimestamp) / rating / note は普通に UPDATE してよい。
 # 日付を直すと並び順が変わって状態が変わりうるが、状態は current_state ビューの導出なので整合する。
 class Event < ApplicationRecord
   # `type` は STI の予約カラムだが、DDL の語彙に忠実であることを優先する。
@@ -40,9 +40,9 @@ class Event < ApplicationRecord
   end
 
   def occurred_on_is_fuzzy_date
-    return if FuzzyDate.valid?(occurred_on)
+    return if FuzzyTimestamp.valid?(occurred_on)
 
-    errors.add(:occurred_on, "は「2026/9/25」「2026/9」「2026」「今日」のように書いてください (暦にある日付で)")
+    errors.add(:occurred_on, "は「2026/9/25」「2026/9」「2026」「今日」「昨日 14:30」のように書いてください (暦にある日付で)")
   end
 
   def transition_is_append_only

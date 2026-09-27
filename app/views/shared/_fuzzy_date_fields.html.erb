@@ -1,8 +1,8 @@
-<%# 日付。1つの欄に書いたものを FuzzyDate.parse で読む。空なら不明。locals: value:, legend: ("日付") %>
+<%# 日付 (時刻も書ける)。1つの欄に書いたものを FuzzyTimestamp.parse で読む。空なら不明。locals: value:, legend: ("日付") %>
 <div class="fuzzy-date" data-controller="fuzzy-date" data-fuzzy-date-url-value="<%= fuzzy_date_path %>">
   <label><%= local_assigns.fetch(:legend, "日付") %>
-    <small>2026/9/25・2026/9・2026・9/25・今日・去年 など。空なら不明</small>
-    <%= text_field_tag "event[occurred_on]", FuzzyDate.input_value(value), autocomplete: "off",
+    <small>2026/9/25・2026/9・2026・9/25・今日・去年・昨日 14:30 など。空なら不明</small>
+    <%= text_field_tag "event[occurred_on]", FuzzyTimestamp.input_value(value), autocomplete: "off",
           data: { fuzzy_date_target: "input", action: "input->fuzzy-date#preview" } %>
   </label>
   <span class="quick-dates">

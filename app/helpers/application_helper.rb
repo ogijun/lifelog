@@ -19,19 +19,19 @@ module ApplicationHelper
     from == "did" && type == "wished" ? "また#{label}" : label
   end
 
-  # 精度可変の日付 (FuzzyDate)。不明なら time 要素にしない。
+  # 精度可変の日時 (FuzzyTimestamp)。不明なら time 要素にしない。
   def fuzzy_date_tag(value)
-    return tag.span(FuzzyDate.label(nil), class: "unknown-date") if value.nil?
+    return tag.span(FuzzyTimestamp.label(nil), class: "unknown-date") if value.nil?
 
-    tag.time FuzzyDate.label(value), datetime: value
+    tag.time FuzzyTimestamp.label(value), datetime: value
   end
 
   # したいと思ってからの期間。日の精度でなければ期間を言えないので、いつからかだけ言う。
   def wished_since(as_of)
     return "いつからか分からない" if as_of.nil?
-    return "#{FuzzyDate.label(as_of)}から" unless as_of.length == 10
+    return "#{FuzzyTimestamp.label(as_of)}から" unless %i[day minute].include?(FuzzyTimestamp.precision(as_of))
 
-    "#{distance_of_time_in_words(Date.iso8601(as_of), Date.current)} 前から"
+    "#{distance_of_time_in_words(Date.iso8601(as_of[0, 10]), Date.current)} 前から"
   end
 
   # 外部 ID の値。http(s) の URL だけ別タブのリンクにする (javascript: などはリンクにしない)。
