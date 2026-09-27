@@ -28,6 +28,16 @@ class FuzzyDateFormTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "時刻も書ける (分まで)。一覧に時刻も出る" do
+    travel_to Date.new(2026, 9, 25) do
+      assert_equal "2026-09-25T14:30", record_book("細雪", "2026/9/25 14:30").occurred_on
+      assert_equal "2026-09-24T09:05", record_book("鍵", "昨日 9:05").occurred_on
+    end
+
+    get root_path
+    assert_select ".event time[datetime='2026-09-25T14:30']", "2026年9月25日 14:30"
+  end
+
   test "空なら日付不明で記録でき、一覧に日付不明と出る" do
     assert_nil record_book("細雪", "").occurred_on
 
