@@ -3,8 +3,7 @@
   <% if state %>
     <%= state_stamp(state.status, subject.kind, large: true) %>
     <span class="as-of"><%= FuzzyTimestamp.label(state.as_of) %> 時点</span>
-    <%= render "shared/transition_buttons", subject:, status: state.status %>
-    <%= link_to "日付や評価を指定して記録", new_subject_transition_path(subject), class: "dated" %>
+    <%= render "shared/transition_buttons", subject:, status: state.status, dated: true %>
   <% else %>
     <span class="as-of">まだ何もない</span>
   <% end %>

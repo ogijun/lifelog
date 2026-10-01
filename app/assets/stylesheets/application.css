@@ -218,13 +218,16 @@ h2 .kind { display: block; margin-bottom: .2rem; color: var(--muted); font: 400 
   margin: 1rem 0 1.4rem;
 }
 .state .as-of { color: var(--muted); font-size: .85rem; }
-/* ボタンは今日で記録する。日付などを指定したいときだけこのリンクから */
-.state .dated { color: var(--muted); font-size: .8rem; }
-.state .dated:hover { color: var(--indigo); }
+/* 状態のボタンと同じフォームに日付の欄を置く (最初は「今日」) */
+.state .transitions { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .6rem 1rem; flex-basis: 100%; }
+.state .fuzzy-date label { display: flex; flex-direction: column; gap: .2rem; font-size: .8rem; color: var(--muted); }
+.state .fuzzy-date label small { display: none; }
+.state .fuzzy-date input { width: 11rem; }
+.state .buttons { display: inline-flex; flex-wrap: wrap; gap: .4rem; padding-bottom: 1.75rem; }
 
 /* 状態を次に進めるボタン (いまの状態の横、今日の候補の各行) */
 .transitions { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
-.transitions form.button_to { display: inline; }
+.transitions .buttons { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
 .transition {
   font: inherit;
   font-size: .82rem;
