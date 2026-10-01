@@ -17,7 +17,7 @@ class UndoFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "追記を取り消したら詳細ページに戻る" do
-    post subject_events_path(@subject), params: { event: { type: "did", occurred_on: "2026/3/1" } }
+    post subject_transition_path(@subject), params: { type: "did" }
     appended = @subject.events.find_by!(type: "did")
 
     delete event_path(appended)
