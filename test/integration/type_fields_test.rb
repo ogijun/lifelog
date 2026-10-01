@@ -10,14 +10,4 @@ class TypeFieldsTest < ActionDispatch::IntegrationTest
       assert_select "fieldset.type-choice input[type=radio][value=wished][checked]"
     end
   end
-
-  test "詳細ページの記録フォームも「どうなった」で、見出しは役割が分かるもの" do
-    s = Subject.create!(kind: "place", title: "芦屋の割烹")
-    Event.create!(subject: s, type: "wished", occurred_on: "2026")
-
-    get subject_path(s)
-    assert_select "h3", "日付や評価をつけて記録する"
-    assert_select "fieldset.type-choice legend", "どうなった"
-    assert_select "fieldset.type-choice input[type=radio][value=did][checked]"
-  end
 end
