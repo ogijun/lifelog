@@ -16,7 +16,7 @@ class DatedTransitionTest < ActionDispatch::IntegrationTest
       assert_select "button[name=type][value=dropped]", "やめた"
       assert_select "details:not([open]) summary", "日付や評価も入れる"
       assert_select "details input[type=text][name='event[occurred_on]'][value='今日']"
-      assert_select "details select[name='event[rating]']"
+      assert_select "details .stars input[type=radio][name='event[rating]']", 5
       assert_select "details textarea[name='event[note]']"
     end
     assert_select "form.record", 0
