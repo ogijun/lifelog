@@ -14,10 +14,11 @@ class StateTransitionTest < ActionDispatch::IntegrationTest
     assert_select ".state form[action=?] button", subject_transition_path(@video), text: "やめた"
   end
 
-  test "見たのときは「また見たい」、やめたのときは「見たい」が出る" do
+  test "見たのときは「また見たい」と「もう一度見た」、やめたのときは「見たい」が出る" do
     Event.create!(subject: @video, type: "did", occurred_on: "2026-09-10")
     get subject_path(@video)
     assert_select ".state button", text: "また見たい"
+    assert_select ".state button", text: "もう一度見た"
 
     Event.create!(subject: @video, type: "dropped", occurred_on: "2026-09-11")
     get subject_path(@video)
@@ -32,6 +33,17 @@ class StateTransitionTest < ActionDispatch::IntegrationTest
     assert_redirected_to @video
     assert_equal "did", status
     assert_equal "2026-09-25", @video.events.find_by!(type: "did").occurred_on
+  end
+
+  test "「もう一度見た」は、見たをもう1件記録する (再読・再訪)" do
+    Event.create!(subject: @video, type: "did", occurred_on: "2026-09-10")
+
+    travel_to Date.new(2026, 9, 25) do
+      post subject_transition_path(@video), params: { type: "did" }
+    end
+
+    assert_equal [ "2026-09-10", "2026-09-25" ], @video.events.where(type: "did").order(:occurred_on).pluck(:occurred_on)
+    assert_equal "did", status
   end
 
   test "今日の候補の各行にも次の状態のボタンがある" do
