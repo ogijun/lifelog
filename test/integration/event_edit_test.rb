@@ -15,7 +15,7 @@ class EventEditTest < ActionDispatch::IntegrationTest
     get edit_event_path(@did)
     assert_response :success
     assert_select "input[name='event[occurred_on]'][value='2019']"
-    assert_select "select[name='event[rating]'] option[selected][value='3']"
+    assert_select ".stars input[type=radio][name='event[rating]'][value='3'][checked]"
   end
 
   test "日付を直すと状態が計算し直され、詳細ページに戻る" do
