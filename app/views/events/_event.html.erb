@@ -1,21 +1,26 @@
 <li class="event" id="<%= dom_id(event) %>">
   <%= fuzzy_date_tag(event.occurred_on) %>
-  <%= cover_image(event.subject, "thumb") %>
-  <span class="kind kind-<%= event.subject.kind %>"><%= kind_label(event.subject.kind) %></span>
-  <%= link_to event.subject.title, event.subject %>
-  <span class="type type-<%= event.type %>"><%= type_label(event.type, event.subject.kind) %></span>
-  <%= rating_stars(event.rating) %>
-  <% if event.subject.creator.present? %><span class="creator"><%= event.subject.creator %></span><% end %>
-  <% if event.source_url %>
-    <span class="source">出どころ: <%= external_link(event.source_url) %></span>
-  <% end %>
-  <% if event.cause %>
-    <span class="cause">← <%= link_to event.cause.subject.title, event.cause.subject %> から</span>
-  <% end %>
-  <%= link_to "編集", edit_event_path(event), class: "edit" %>
-  <% if event.undoable? %>
-    <%= button_to "取り消す", event_path(event), method: :delete, class: "undo",
-          form: { data: { turbo_confirm: "この記録を取り消す？ 最初の記録なら対象ごと消える。" } } %>
-  <% end %>
-  <% if event.note.present? %><p class="note"><%= event.note %></p><% end %>
+  <%= cover_thumb(event.subject) %>
+  <div class="body">
+    <p class="title"><%= link_to event.subject.title, event.subject %> <%= rating_stars(event.rating) %></p>
+    <p class="meta">
+      <span class="kind kind-<%= event.subject.kind %>"><%= kind_label(event.subject.kind) %></span>
+      <% if event.subject.creator.present? %><span class="creator"><%= event.subject.creator %></span><% end %>
+      <% if event.source_url %><span class="source"><%= source_link(event.source_url) %></span><% end %>
+      <% if event.cause %>
+        <span class="cause">← <%= link_to event.cause.subject.title, event.cause.subject %> から</span>
+      <% end %>
+    </p>
+    <% if event.note.present? %><p class="note"><%= event.note %></p><% end %>
+  </div>
+  <div class="side">
+    <%= state_stamp(event.type, event.subject.kind) %>
+    <span class="actions">
+      <%= link_to "編集", edit_event_path(event), class: "edit" %>
+      <% if event.undoable? %>
+        <%= button_to "取り消す", event_path(event), method: :delete, class: "undo",
+              form: { data: { turbo_confirm: "この記録を取り消す？ 最初の記録なら対象ごと消える。" } } %>
+      <% end %>
+    </span>
+  </div>
 </li>

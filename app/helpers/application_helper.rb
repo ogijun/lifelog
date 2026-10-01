@@ -51,6 +51,23 @@ module ApplicationHelper
             target: "_blank", rel: "noopener noreferrer", class: "maps-search"
   end
 
+  # 状態の判子。読んだ・行った (did) は朱の判子、読みたい (wished) は鉛筆の下書き、やめた (dropped) は打ち消し。
+  def state_stamp(type, kind, large: false)
+    tag.span(type_label(type, kind), class: [ "type", "type-#{type}", "stamp", ("stamp-large" if large) ])
+  end
+
+  # 一覧の画像の枠。画像が無くても同じ大きさを取り、種類の1文字を薄く置く (行の高さと文字の位置をそろえる)。
+  def cover_thumb(subject)
+    cover_image(subject, "thumb") || tag.span(kind_label(subject.kind).first, class: "thumb thumb-empty", "aria-hidden": true)
+  end
+
+  # 出どころは長い URL をそのまま出さず、ホスト名で「x.com から」と出す。
+  def source_link(url)
+    return url unless HttpUrl.valid?(url)
+
+    link_to "#{URI(url).host.delete_prefix('www.')} から", url, target: "_blank", rel: "noopener noreferrer"
+  end
+
   # 対象の顔になる画像。無ければ何も出さない。
   def cover_image(subject, css)
     return unless subject.cover.attached?
