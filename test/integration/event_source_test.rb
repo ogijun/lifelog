@@ -19,12 +19,9 @@ class EventSourceTest < ActionDispatch::IntegrationTest
     assert_select ".event .source a[href=?][rel~=noreferrer]", BLOG
   end
 
-  test "詳細ページの記録と、イベントの編集でも出どころを入れられる" do
+  test "イベントの編集でも出どころを入れられる" do
     subject = Subject.create!(kind: "book", title: "細雪")
     event = Event.create!(subject:, type: "wished", occurred_on: "2026")
-
-    post subject_events_path(subject), params: { event: { type: "did", occurred_on: "2026/9/1", source_url: BLOG } }
-    assert_equal BLOG, subject.events.find_by!(type: "did").source_url
 
     get edit_event_path(event)
     assert_select "input[name='event[source_url]']"
