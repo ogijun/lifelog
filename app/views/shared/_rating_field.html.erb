@@ -1,0 +1,12 @@
+<%# 評価。星5つのラジオと「なし」。なぞると ★ になるのは CSS だけ (application.css の .stars)。
+    同じページに2つ出ても id がぶつからないように、id に乱数を入れる。locals: value: %>
+<% uid = SecureRandom.hex(3) %>
+<fieldset class="rating-input">
+  <legend>評価</legend>
+  <span class="stars">
+    <% (1..5).each do |n| %>
+      <%= radio_button_tag "event[rating]", n, value.to_i == n, id: "rating_#{uid}_#{n}", "aria-label": "星#{n}つ" %><%= label_tag "rating_#{uid}_#{n}", "", title: "★" * n %>
+    <% end %>
+  </span>
+  <label class="no-rating"><%= radio_button_tag "event[rating]", "", value.blank?, id: "rating_#{uid}_none" %>なし</label>
+</fieldset>
