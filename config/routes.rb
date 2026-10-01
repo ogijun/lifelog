@@ -15,7 +15,6 @@ Rails.application.routes.draw do
   resource :capture, only: :show
 
   resources :subjects, only: :show do
-    resources :events, only: :create
     resource :cover, only: [ :update, :destroy ]
     resource :transition, only: :create
   end

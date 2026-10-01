@@ -1,7 +1,0 @@
-<%= turbo_stream.prepend "events" do %>
-  <%= render "events/event", event: @event %>
-<% end %>
-
-<%= turbo_stream.update "state" do %>
-  <%= render "subjects/state", subject: @subject, state: @state %>
-<% end %>

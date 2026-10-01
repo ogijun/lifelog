@@ -13,10 +13,12 @@ module ApplicationHelper
   def kind_label(kind) = KIND_LABELS.fetch(kind, kind)
   def type_label(type, kind) = VERB_LABELS.dig(kind, type) || TYPE_LABELS.fetch(type, type)
 
-  # 状態を次に進めるボタンの文言。「見た」のあとの「見たい」は「また見たい」。
+  # 状態を次に進めるボタンの文言。「見た」のあとは「また見たい」と「もう一度見た」(再読・再訪)。
   def transition_label(type, kind, from:)
     label = type_label(type, kind)
-    from == "did" && type == "wished" ? "また#{label}" : label
+    return label unless from == "did"
+
+    type == "did" ? "もう一度#{label}" : "また#{label}"
   end
 
   # 精度可変の日時 (FuzzyTimestamp)。不明なら time 要素にしない。
