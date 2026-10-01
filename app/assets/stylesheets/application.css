@@ -1,18 +1,34 @@
+/*
+ * 記録帳と判子。
+ *
+ * 画面の個性は「状態の判子」1つに集める (読んだ・行った = 朱の判子、読みたい = 鉛筆の下書き、
+ * やめた = 打ち消し)。ほかは墨と紙だけで静かにする。朱は判子にしか使わない。
+ * Web フォントは読まない (ローカルファースト。外部への通信を増やさない)。
+ */
+
 :root {
-  --fg: #1c1b19;
-  --muted: #6b6862;
-  --bg: #faf8f4;
-  --line: #e0dcd3;
-  --accent: #7a4a2b;
+  --paper: #f3f5f4;
+  --paper-raised: #fbfcfb;
+  --ink: #23262b;
+  --muted: #6e747b;
+  --line: #d9dedc;
+  --seal: #c8312b;
+  --indigo: #2f4f86;
+  --danger: #b3261e;
+  --sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+  --serif: "Hiragino Mincho ProN", "Noto Serif JP", "Yu Mincho", serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fg: #ece8e1;
-    --muted: #9a958c;
-    --bg: #1a1917;
-    --line: #35322d;
-    --accent: #d8a97f;
+    --paper: #17191c;
+    --paper-raised: #1e2125;
+    --ink: #e6e8e6;
+    --muted: #9aa0a6;
+    --line: #33373c;
+    --seal: #e5533f;
+    --indigo: #9db4e0;
+    --danger: #f08b80;
   }
 }
 
@@ -20,162 +36,324 @@
 
 body {
   margin: 0;
-  padding: 0 1rem 4rem;
-  background: var(--bg);
-  color: var(--fg);
-  font: 15px/1.7 ui-sans-serif, "Hiragino Sans", system-ui, sans-serif;
+  padding: 0 1rem 5rem;
+  background: var(--paper);
+  color: var(--ink);
+  font: 15px/1.75 var(--sans);
+  font-feature-settings: "palt";
 }
 
 header, main { max-width: 46rem; margin: 0 auto; }
 
-header {
-  padding: 1.5rem 0 1rem;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 1.5rem;
+a { color: var(--indigo); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: .2em; }
+
+:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; border-radius: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
 }
 
-header h1 { font-size: 1.1rem; margin: 0 0 .5rem; letter-spacing: .06em; }
-header h1 a { color: var(--fg); text-decoration: none; }
+/* ヘッダ */
 
-nav { display: flex; flex-wrap: wrap; gap: .9rem; font-size: .85rem; }
-nav .sep { color: var(--muted); border-left: 1px solid var(--line); padding-left: .9rem; }
-
-a { color: var(--accent); }
-
-h2 { font-size: 1.3rem; font-weight: 600; }
-h3 { font-size: .95rem; color: var(--muted); margin-top: 2rem; }
-
-.lead, .empty, .creator, .as-of, .cause, .note { color: var(--muted); }
-.lead, .empty { font-size: .85rem; }
-
-.filters { display: flex; gap: .8rem; font-size: .85rem; }
-.filters a { text-decoration: none; }
-.filters a.on { color: var(--fg); font-weight: 600; text-decoration: underline; }
-
-.timeline { list-style: none; padding: 0; margin: 1.5rem 0; }
-
-.event {
-  padding: .7rem 0;
-  border-bottom: 1px solid var(--line);
+header {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: .5rem;
+  gap: .4rem 1.6rem;
+  padding: 1.6rem 0 1.1rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1.8rem;
 }
 
-.event time, .event .unknown-date { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .8rem; min-width: 8.5rem; }
-.event .note { flex-basis: 100%; margin: .2rem 0 0; font-size: .85rem; }
+header h1 { margin: 0; font: 600 1.25rem/1 var(--serif); letter-spacing: .04em; }
+header h1 a { color: var(--ink); }
 
-.kind, .type {
-  font-size: .72rem;
-  padding: .1rem .45rem;
-  border: 1px solid var(--line);
-  border-radius: 2px;
+nav { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem 1rem; font-size: .88rem; }
+nav a { color: var(--ink); }
+nav .sep { color: var(--muted); font-size: .78rem; margin-left: .6rem; }
+
+/* 見出しと本文 */
+
+h2 { font: 600 1.45rem/1.4 var(--serif); margin: 0 0 1rem; }
+h3 { font-size: .9rem; font-weight: 600; color: var(--muted); margin: 2.2rem 0 .7rem; }
+
+.lead, .empty { color: var(--muted); font-size: .85rem; }
+
+.filters { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .85rem; margin: 0 0 .5rem; }
+.filters a { color: var(--muted); }
+.filters a.on { color: var(--ink); font-weight: 600; }
+
+.alert, .notice { padding: .4rem .8rem; font-size: .88rem; border-left: 3px solid; }
+.alert { color: var(--danger); border-color: var(--danger); }
+.notice { color: var(--muted); border-color: var(--line); }
+
+/* 一覧の行: 日付 / 画像の枠 / 名前と補足 / 判子 */
+
+.timeline, .candidates { list-style: none; padding: 0; margin: 1rem 0; }
+
+.event {
+  display: grid;
+  grid-template-columns: 7.2rem 2.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: .9rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--line);
 }
 
-.type-did { border-color: var(--accent); color: var(--accent); }
-.type-dropped { opacity: .55; }
-
-.rating { color: var(--accent); letter-spacing: .05em; }
-.creator, .cause, .as-of { font-size: .8rem; }
-
-.record { display: flex; flex-direction: column; gap: .6rem; max-width: 30rem; }
-.record fieldset { border: 1px solid var(--line); padding: 1rem; display: flex; flex-direction: column; gap: .6rem; }
-.record legend { font-size: .8rem; color: var(--muted); padding: 0 .4rem; }
-.record label { display: flex; flex-direction: column; gap: .2rem; font-size: .8rem; color: var(--muted); }
-/* 日付は1つの欄。横に今日・昨日・不明のボタンと、読み取った結果。 */
-.fuzzy-date { display: flex; flex-direction: column; gap: .3rem; }
-.quick-dates { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; font-size: .8rem; }
-.quick-dates button {
-  font: inherit; color: var(--muted); background: none;
-  border: 1px solid var(--line); border-radius: 3px; padding: .05rem .5rem; cursor: pointer;
-}
-.quick-dates button:hover { color: var(--accent); border-color: var(--accent); }
-.quick-dates output { color: var(--muted); }
-
-input, select, textarea {
-  font: inherit;
-  padding: .4rem .5rem;
-  border: 1px solid var(--line);
-  border-radius: 2px;
-  background: var(--bg);
-  color: var(--fg);
+.event time, .event .unknown-date {
+  color: var(--muted);
+  font-size: .8rem;
+  font-variant-numeric: tabular-nums;
 }
 
-input[type="submit"] {
-  align-self: flex-start;
-  cursor: pointer;
-  padding: .5rem 1.4rem;
-  border-color: var(--accent);
-  color: var(--accent);
+.event .body { min-width: 0; }
+.event .title { margin: 0; font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
+.event .title a { color: var(--ink); }
+
+.event .meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 .8rem;
+  margin: .1rem 0 0;
+  color: var(--muted);
+  font-size: .78rem;
 }
+.event .meta a { color: var(--muted); }
+.event .meta a:hover { color: var(--indigo); }
+.event .note { margin: .35rem 0 0; color: var(--muted); font-size: .85rem; }
 
-.errors { color: #b3261e; font-size: .85rem; padding-left: 1.2rem; }
-
-.external-ids { display: grid; grid-template-columns: max-content 1fr; gap: .2rem 1rem; font-size: .85rem; }
-.external-ids dt { color: var(--muted); }
-.external-ids dd { margin: 0; }
+/* 判子と、その下の操作 (編集・取り消す)。操作は行に触れているときだけ出す (キーボードで選んだときも)。
+   見えないときも場所は取るので、どの行も同じ高さになる */
+.event .side { display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; }
+.event .actions { display: flex; gap: .7rem; font-size: .75rem; visibility: hidden; }
+.event:hover .actions, .event:focus-within .actions { visibility: visible; }
+@media (hover: none) {
+  .event .actions { visibility: visible; }
+}
+.event .actions a { color: var(--muted); }
+.event .actions a:hover { color: var(--indigo); }
 
 .event form.button_to { display: inline; }
 .event .undo {
   font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+.event .undo:hover { color: var(--danger); }
+
+.rating { color: var(--seal); font-size: .8rem; letter-spacing: .05em; }
+
+/* 画像の枠。画像が無ければ種類の1文字を薄く置く */
+.thumb {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 3px;
+}
+img.thumb { object-fit: cover; display: block; }
+.thumb-empty {
+  display: grid;
+  place-items: center;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  color: var(--line);
+  font: 600 1.05rem/1 var(--serif);
+}
+
+/* 判子 */
+
+.stamp {
+  display: inline-grid;
+  place-items: center;
+  min-width: 3.4rem;
+  padding: .25rem .5rem;
+  border: 2px solid currentColor;
+  border-radius: 5px;
+  font: 700 .82rem/1.15 var(--serif);
+  letter-spacing: .08em;
+  white-space: nowrap;
+  transform: rotate(-4deg);
+}
+
+/* 読んだ・行った・見た: 朱の判子。押したときのかすれを影で少しだけ */
+.stamp.type-did {
+  color: var(--seal);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--seal) 35%, transparent);
+  opacity: .92;
+}
+
+/* 読みたい・行きたい: 鉛筆の下書き */
+.stamp.type-wished {
+  color: var(--muted);
+  border-width: 1.5px;
+  border-style: dashed;
+  font-weight: 600;
+  transform: rotate(-2deg);
+}
+
+/* やめた: 打ち消し */
+.stamp.type-dropped {
+  color: var(--muted);
+  border-color: var(--line);
+  text-decoration: line-through;
+  transform: none;
+}
+
+.stamp-large { min-width: 4.6rem; padding: .4rem .8rem; font-size: 1.05rem; }
+
+/* 詳細ページ */
+
+h2 .kind { display: block; margin-bottom: .2rem; color: var(--muted); font: 400 .8rem/1.4 var(--sans); }
+
+.creator { color: var(--muted); margin: -.6rem 0 .8rem; }
+
+.state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .6rem 1rem;
+  margin: 1rem 0 1.4rem;
+}
+.state .as-of { color: var(--muted); font-size: .85rem; }
+
+/* 状態を次に進めるボタン (いまの状態の横、今日の候補の各行) */
+.transitions { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
+.transitions form.button_to { display: inline; }
+.transition {
+  font: inherit;
+  font-size: .82rem;
+  color: var(--indigo);
+  background: none;
+  border: 1px solid var(--indigo);
+  border-radius: 3px;
+  padding: .1rem .7rem;
+  cursor: pointer;
+}
+.transition:hover { background: var(--indigo); color: var(--paper); }
+
+.event .transitions { justify-self: end; }
+
+/* 今日の候補の行には日付が無い */
+.wishlist .event { grid-template-columns: 2.6rem minmax(0, 1fr) auto; }
+
+img.cover { max-width: 14rem; max-height: 18rem; object-fit: contain; border: 1px solid var(--line); background: var(--paper-raised); }
+.cover-box { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .8rem; margin: 1rem 0; }
+.cover-form { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; font-size: .8rem; color: var(--muted); }
+.cover-form label { display: flex; flex-direction: column; gap: .2rem; }
+.cover-form input[type="file"] { font-size: .8rem; padding: .3rem; background: none; }
+/* 画像の差し替えは控えめに (主な操作は記録のほう) */
+.cover-form input[type="submit"], .cover-box form.button_to button {
+  font: inherit;
   font-size: .8rem;
+  font-weight: 400;
+  color: var(--indigo);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: .25rem .8rem;
+  cursor: pointer;
+}
+.cover-box form.button_to button { color: var(--muted); border: 0; text-decoration: underline; text-underline-offset: .2em; padding: .25rem 0; }
+.cover-box form.button_to button:hover { color: var(--danger); }
+
+.external-ids { display: grid; grid-template-columns: max-content 1fr; gap: .2rem 1rem; font-size: .85rem; }
+.external-ids dt { color: var(--muted); }
+.external-ids dd { margin: 0; overflow-wrap: anywhere; }
+
+/* フォーム */
+
+.record { display: flex; flex-direction: column; gap: .8rem; max-width: 32rem; }
+.record fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1rem 1.1rem 1.2rem;
+  background: var(--paper-raised);
+}
+.record legend { font-size: .8rem; color: var(--muted); padding: 0 .4rem; }
+.record label { display: flex; flex-direction: column; gap: .25rem; font-size: .8rem; color: var(--muted); }
+
+input, select, textarea {
+  font: inherit;
+  font-size: .95rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: .45rem .55rem;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--indigo); outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--indigo) 25%, transparent); }
+
+input[type="submit"] {
+  align-self: flex-start;
+  cursor: pointer;
+  color: var(--paper);
+  background: var(--indigo);
+  border-color: var(--indigo);
+  padding: .5rem 1.6rem;
+  font-weight: 600;
+}
+input[type="submit"]:hover { filter: brightness(1.1); }
+
+.errors { color: var(--danger); font-size: .85rem; padding-left: 1.2rem; }
+
+/* 「どうなった」は選択肢を横に並べて全部見せる */
+.record fieldset.type-choice { border: 0; padding: 0; background: none; flex-direction: row; flex-wrap: wrap; gap: .9rem; }
+.record .type-choice legend { padding: 0; margin-bottom: .2rem; }
+.record .type-choice label { flex-direction: row; align-items: center; gap: .3rem; font-size: .95rem; color: var(--ink); }
+.type-choice input[type="radio"] { width: auto; accent-color: var(--indigo); }
+
+/* 日付は1つの欄。横に今日・昨日・不明のボタンと、読み取った結果 */
+.fuzzy-date { display: flex; flex-direction: column; gap: .3rem; }
+.quick-dates { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; font-size: .8rem; }
+.quick-dates button {
+  font: inherit;
   color: var(--muted);
   background: none;
   border: 1px solid var(--line);
   border-radius: 3px;
-  padding: 0 .4rem;
+  padding: .05rem .55rem;
   cursor: pointer;
 }
-.event .undo:hover { color: var(--accent); border-color: var(--accent); }
-.event .edit { font-size: .8rem; color: var(--muted); }
-.event .edit:hover { color: var(--accent); }
+.quick-dates button:hover { color: var(--indigo); border-color: var(--indigo); }
+.quick-dates output { color: var(--muted); }
 
-.alert {
-  border-left: 3px solid var(--accent);
-  padding: .3rem .7rem;
-  color: var(--accent);
-}
-
-.notice {
-  border-left: 3px solid var(--muted);
-  padding: .3rem .7rem;
-  color: var(--muted);
-}
-
-.cover-preview { margin: 0; display: flex; flex-direction: column; gap: .2rem; }
+.cover-preview { margin: 0; display: flex; flex-direction: column; gap: .3rem; }
 .cover-preview img { max-width: 12rem; max-height: 12rem; object-fit: contain; border: 1px solid var(--line); }
 .cover-preview figcaption { font-size: .8rem; color: var(--muted); }
-
-img.cover { max-width: 16rem; max-height: 20rem; object-fit: contain; border: 1px solid var(--line); }
-img.thumb { width: 2.4rem; height: 2.4rem; object-fit: cover; border-radius: 3px; vertical-align: middle; }
-.cover-box { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .8rem; margin: .8rem 0; }
-.cover-form { display: flex; align-items: flex-end; gap: .4rem; font-size: .8rem; color: var(--muted); }
-
-/* 状態を次に進めるボタン。いまの状態の横と今日の候補の各行に出す。 */
-.transitions form.button_to { display: inline; }
-.transition {
-  font: inherit;
-  font-size: .8rem;
-  color: var(--accent);
-  background: none;
-  border: 1px solid var(--accent);
-  border-radius: 3px;
-  padding: .05rem .6rem;
-  margin-left: .3rem;
-  cursor: pointer;
-}
-.transition:hover { background: var(--accent); color: var(--bg); }
-
-/* 「どうなった」は選択肢を横に並べて全部見せる。 */
-.record fieldset.type-choice { border: 0; padding: 0; flex-direction: row; flex-wrap: wrap; gap: .9rem; }
-.record .type-choice legend { padding: 0; margin-bottom: .2rem; }
-.record .type-choice label { flex-direction: row; align-items: center; gap: .3rem; font-size: .95rem; color: var(--fg); }
-.type-choice input[type="radio"] { width: auto; }
-
-.event .source { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
-
-.candidates { list-style: none; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
-.candidates small { color: var(--muted); margin-left: .4rem; }
 .record .cover-take { flex-direction: row; align-items: center; gap: .3rem; }
-.cover-take input[type="checkbox"] { width: auto; }
+.cover-take input[type="checkbox"] { width: auto; accent-color: var(--indigo); }
+
+/* capture の候補と種類選び */
+
+.candidates { display: flex; flex-direction: column; gap: .5rem; }
+.candidates li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .7rem; }
+.candidates small { color: var(--muted); }
+.candidates .kind { color: var(--muted); font-size: .8rem; }
+
+.kind-choice { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; font-size: 1rem; }
+.maps-search { font-size: .8rem; }
+
+/* 狭い画面: 日付を名前の上に回す */
+
+@media (max-width: 34rem) {
+  header { padding-top: 1.1rem; }
+  .event {
+    grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+    grid-template-areas: "thumb date stamp" "thumb body stamp";
+    row-gap: .1rem;
+  }
+  .event time, .event .unknown-date { grid-area: date; }
+  .event .thumb { grid-area: thumb; align-self: start; }
+  .event .body { grid-area: body; }
+  .event .side, .event .transitions { grid-area: stamp; }
+  .wishlist .event { grid-template-areas: "thumb body stamp"; }
+}
