@@ -6,11 +6,15 @@ class FuzzyDateFormTest < ActionDispatch::IntegrationTest
     Subject.find_by(title:)&.events&.sole
   end
 
-  test "日付は1つの欄で、今日が入っている (日本時間)" do
+  test "日付は1つの欄で、最初は「今日」が入っている (数字ではなく言葉。開いたまま日付をまたいでも正しい)" do
+    get new_book_path
+    assert_select "input[type=text][name='event[occurred_on]'][value='今日']"
+    assert_select "input[name='event[occurred_year]']", 0
+  end
+
+  test "「今日」のまま記録すると、記録した日 (日本時間) になる" do
     travel_to Time.utc(2026, 9, 24, 16, 30) do # 日本時間 9/25 1:30
-      get new_book_path
-      assert_select "input[type=text][name='event[occurred_on]'][value='2026/9/25']"
-      assert_select "input[name='event[occurred_year]']", 0
+      assert_equal "2026-09-25", record_book("細雪", "今日").occurred_on
     end
   end
 
