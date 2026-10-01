@@ -23,6 +23,8 @@ class Event < ApplicationRecord
   normalizes :caused_by, with: ->(id) { id.presence }
   # 出どころ: どこでそれを知ったか (ブログや投稿の URL)。対象そのものの URL とは別。
   normalizes :source_url, with: ->(url) { url.strip.presence }
+  # 空のメモは無いのと同じ。
+  normalizes :note, with: ->(note) { note.presence }
 
   validates :type, inclusion: { in: TYPES }
   validate :occurred_on_is_fuzzy_date
