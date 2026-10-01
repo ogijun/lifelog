@@ -44,28 +44,14 @@ class RecordingFlowTest < ActionDispatch::IntegrationTest
     assert_select ".errors"
   end
 
-  test "詳細から追記すると状態が変わる" do
+  test "詳細ページには記録フォームを置かない (状態はボタンで進め、細かいことは編集で直す)" do
     post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_on: "2026/1/1" } }
     subject = Subject.last
 
-    post subject_events_path(subject), params: { event: { type: "did", occurred_on: "2026/3/1", rating: "5" } }
-    assert_redirected_to subject
-
-    assert_equal "did", CurrentState.find(subject.id).status
-  end
-
-  test "追記は Turbo Stream で一覧と状態を差し替える" do
-    post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_on: "2026/1/1" } }
-    subject = Subject.last
-
-    post subject_events_path(subject),
-      params: { event: { type: "did", occurred_on: "2026/3/1" } },
-      as: :turbo_stream
-
-    assert_response :success
-    assert_match "turbo-stream", response.media_type
-    assert_match %r{action="prepend" target="events"}, response.body
-    assert_match %r{action="update" target="state"}, response.body
+    get subject_path(subject)
+    assert_select "form.record", 0
+    assert_select "input[name='event[occurred_on]']", 0
+    assert_select ".state form[action=?]", subject_transition_path(subject)
   end
 
   test "caused_by で連鎖が辿れる" do
