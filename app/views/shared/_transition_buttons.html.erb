@@ -1,12 +1,22 @@
-<%# 次の状態へ進めるボタン。dated: true なら同じフォームに日付の欄を出す (最初は「今日」)。
-    無ければ今日で記録する。locals: subject:, status:, dated: (false) %>
+<%# 次の状態へ進めるボタン。押せば今日で記録する。
+    detailed: true なら、細かく入れたいときだけ開く欄 (日付・評価・メモ) を同じフォームに持つ。
+    閉じたままなら「今日・評価なし・メモなし」が送られるので、ふだんの挙動と変わらない。
+    locals: subject:, status:, detailed: (false) %>
 <%= form_with url: subject_transition_path(subject), scope: nil, class: "transitions" do %>
-  <% if local_assigns[:dated] %>
-    <%= render "shared/fuzzy_date_fields", value: "今日" %>
-  <% end %>
   <span class="buttons">
     <% Event::NEXT_TYPES.fetch(status, []).each do |type| %>
       <%= button_tag transition_label(type, subject.kind, from: status), name: "type", value: type, class: "transition" %>
     <% end %>
   </span>
+  <% if local_assigns[:detailed] %>
+    <details class="detail">
+      <summary>日付や評価も入れる</summary>
+      <div class="detail-fields">
+        <%= render "shared/fuzzy_date_fields", value: "今日" %>
+        <label>評価<%= select_tag "event[rating]", options_for_select((1..5).map { |n| [ "★" * n, n ] }), include_blank: "—" %></label>
+        <label>メモ<%= text_area_tag "event[note]", nil, rows: 2 %></label>
+        <p class="hint">入れたら、上のボタンで記録する。</p>
+      </div>
+    </details>
+  <% end %>
 <% end %>

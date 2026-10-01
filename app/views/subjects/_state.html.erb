@@ -3,7 +3,7 @@
   <% if state %>
     <%= state_stamp(state.status, subject.kind, large: true) %>
     <span class="as-of"><%= FuzzyTimestamp.label(state.as_of) %> 時点</span>
-    <%= render "shared/transition_buttons", subject:, status: state.status, dated: true %>
+    <%= render "shared/transition_buttons", subject:, status: state.status, detailed: true %>
   <% else %>
     <span class="as-of">まだ何もない</span>
   <% end %>

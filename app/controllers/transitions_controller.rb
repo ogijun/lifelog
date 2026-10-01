@@ -1,13 +1,13 @@
 # 状態を次に進めるボタン。
 #
-# 詳細ページでは、ボタンと同じフォームに日付の欄があり、最初は「今日」が入っている。そのまま押せば
-# 押した時点の今日で記録し、書き換えればその日付 (曖昧でもよい)、空にすれば不明で記録する。
-# 欄に入れておくのが数字の日付ではなく「今日」という言葉なのは、ページを開いたまま日付をまたいでも
-# 押した時点で読まれるようにするため。今日の候補の行は欄なしで、今日で記録する。
+# ふだんはボタンだけで、押した時点の今日で記録する。詳細ページでは、細かく入れたいときだけ開く欄
+# (日付・評価・メモ) が同じフォームにあり、開いて書き換えてから同じボタンを押すと一緒に記録する。
+# 日付の欄は最初「今日」という言葉が入っている (数字の日付ではないので、ページを開いたまま日付を
+# またいでも押した時点で読まれる)。閉じたままなら「今日・評価なし・メモなし」が送られるだけ。
 class TransitionsController < ApplicationController
   def create
     subject = Subject.find(params[:subject_id])
-    Recorder.append(subject, type: params[:type], occurred_on:)
+    Recorder.append(subject, type: params[:type], **detail)
     redirect_to subject, status: :see_other
   rescue ActiveRecord::RecordInvalid => e
     redirect_to subject, status: :see_other, alert: e.record.errors.full_messages.to_sentence
@@ -15,8 +15,10 @@ class TransitionsController < ApplicationController
 
   private
 
-  def occurred_on
-    text = params.key?(:event) ? params.expect(event: [ :occurred_on ])[:occurred_on] : "今日"
-    FuzzyTimestamp.parse(text, now: Time.current)
+  def detail
+    return { occurred_on: FuzzyTimestamp.from_date(Date.current) } unless params.key?(:event)
+
+    p = params.expect(event: [ :occurred_on, :rating, :note ])
+    { occurred_on: FuzzyTimestamp.parse(p[:occurred_on], now: Time.current), rating: p[:rating], note: p[:note] }
   end
 end
