@@ -5,7 +5,7 @@ class PlacesController < ApplicationController
   def new
     # /capture から subject パラメータ付きで来たら値を埋める。保存はしない。
     @subject = Subject.new(params.key?(:subject) ? subject_params : { kind: "place" })
-    @event = Event.new(type: "wished", occurred_on: FuzzyTimestamp.from_date(Date.current), source_url: params[:source_url])
+    @event = Event.new(type: "wished", occurred_on: "今日", source_url: params[:source_url])
     @image_url = params.dig(:subject, :image_url)
   end
 

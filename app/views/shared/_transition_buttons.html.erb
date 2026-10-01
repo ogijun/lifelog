@@ -1,7 +1,12 @@
-<%# 次の状態へ進めるボタン。日付は押した時点でサーバが決める。locals: subject:, status: %>
-<span class="transitions">
-  <% Event::NEXT_TYPES.fetch(status, []).each do |type| %>
-    <%= button_to transition_label(type, subject.kind, from: status), subject_transition_path(subject),
-          params: { type: }, class: "transition" %>
+<%# 次の状態へ進めるボタン。dated: true なら同じフォームに日付の欄を出す (最初は「今日」)。
+    無ければ今日で記録する。locals: subject:, status:, dated: (false) %>
+<%= form_with url: subject_transition_path(subject), scope: nil, class: "transitions" do %>
+  <% if local_assigns[:dated] %>
+    <%= render "shared/fuzzy_date_fields", value: "今日" %>
   <% end %>
-</span>
+  <span class="buttons">
+    <% Event::NEXT_TYPES.fetch(status, []).each do |type| %>
+      <%= button_tag transition_label(type, subject.kind, from: status), name: "type", value: type, class: "transition" %>
+    <% end %>
+  </span>
+<% end %>
