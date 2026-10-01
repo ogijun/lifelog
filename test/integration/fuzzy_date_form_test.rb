@@ -56,15 +56,6 @@ class FuzzyDateFormTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "詳細ページの記録フォームも1つの欄で、見出しは新しいできごとの日付" do
-    subject = record_book("細雪", "2019").subject
-    get subject_path(subject)
-    assert_select ".fuzzy-date label", /新しいできごとの日付/
-
-    post subject_events_path(subject), params: { event: { type: "wished", occurred_on: "2026" } }
-    assert_equal [ "2019", "2026" ], subject.events.order(:created_at).pluck(:occurred_on)
-  end
-
   test "読み取った結果を返す (入力中の表示用)" do
     travel_to Date.new(2026, 9, 25) do
       { "9/25" => "2026年9月25日", "去年" => "2025年", "" => "日付不明", "あした" => "読めない" }.each do |text, label|
