@@ -276,6 +276,7 @@ img.cover { max-width: 14rem; max-height: 18rem; object-fit: contain; border: 1p
 
 .record { display: flex; flex-direction: column; gap: .8rem; max-width: 32rem; }
 .record fieldset {
+  min-width: 0; /* 中身 (長い選択肢のプルダウンなど) に押し広げられない */
   display: flex;
   flex-direction: column;
   gap: .7rem;
@@ -288,6 +289,7 @@ img.cover { max-width: 14rem; max-height: 18rem; object-fit: contain; border: 1p
 .record label { display: flex; flex-direction: column; gap: .25rem; font-size: .8rem; color: var(--muted); }
 
 input, select, textarea {
+  max-width: 100%;
   font: inherit;
   font-size: .95rem;
   color: var(--ink);
@@ -362,4 +364,60 @@ input[type="submit"]:hover { filter: brightness(1.1); }
   .event .body { grid-area: body; }
   .event .side, .event .transitions { grid-area: stamp; }
   .wishlist .event { grid-template-areas: "thumb body stamp"; }
+}
+
+/* 評価の星。なぞると、乗せている星までが ★ になり、少し弾む。中身は5つのラジオで、CSS だけで動く */
+fieldset.rating-input, .record fieldset.rating-input {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .2rem .9rem;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+}
+.rating-input legend { float: left; padding: 0; margin-right: .2rem; color: var(--muted); font-size: .8rem; }
+.rating-input .stars { display: inline-flex; }
+.rating-input .stars input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.rating-input .stars label {
+  display: inline-block;
+  padding: 0 .1rem;
+  color: var(--muted);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .2s cubic-bezier(.34, 1.56, .64, 1), color .12s;
+}
+.rating-input .stars label::before { content: "☆"; }
+
+/* 選ばれている星まで */
+.rating-input .stars input:checked + label,
+.rating-input .stars label:has(~ input:checked) { color: var(--seal); }
+.rating-input .stars input:checked + label::before,
+.rating-input .stars label:has(~ input:checked)::before { content: "★"; }
+.rating-input .stars input:checked + label { animation: star-pop .32s cubic-bezier(.34, 1.56, .64, 1); }
+
+/* なぞっている間 (どれかの星に乗っている間) は、選ばれている星より「いま乗せている星まで」を優先する。
+   星のすき間に乗っているだけのときは、選ばれている評価を見せたままにする */
+.rating-input .stars:has(label:hover) label:not(:hover):not(:has(~ label:hover)) { color: var(--muted); }
+.rating-input .stars:has(label:hover) label:not(:hover):not(:has(~ label:hover))::before { content: "☆"; }
+.rating-input .stars label:hover,
+.rating-input .stars label:has(~ label:hover) { color: var(--seal); }
+.rating-input .stars label:hover::before,
+.rating-input .stars label:has(~ label:hover)::before { content: "★"; }
+.rating-input .stars label:hover { transform: scale(1.3) rotate(-8deg); }
+
+.rating-input .stars input:focus-visible + label { outline: 2px solid var(--indigo); outline-offset: 2px; border-radius: 2px; }
+.rating-input .no-rating { display: inline-flex; flex-direction: row; align-items: center; gap: .25rem; color: var(--muted); font-size: .8rem; cursor: pointer; }
+.rating-input .no-rating input { width: auto; accent-color: var(--indigo); }
+
+@keyframes star-pop {
+  0% { transform: scale(.6); }
+  60% { transform: scale(1.35) rotate(-10deg); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rating-input .stars label { animation: none !important; transform: none !important; }
 }

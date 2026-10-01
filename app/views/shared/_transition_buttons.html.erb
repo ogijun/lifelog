@@ -13,7 +13,7 @@
       <summary>日付や評価も入れる</summary>
       <div class="detail-fields">
         <%= render "shared/fuzzy_date_fields", value: "今日" %>
-        <label>評価<%= select_tag "event[rating]", options_for_select((1..5).map { |n| [ "★" * n, n ] }), include_blank: "—" %></label>
+        <%= render "shared/rating_field", value: nil %>
         <label>メモ<%= text_area_tag "event[note]", nil, rows: 2 %></label>
         <p class="hint">入れたら、上のボタンで記録する。</p>
       </div>
