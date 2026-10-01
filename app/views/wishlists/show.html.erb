@@ -1,9 +1,7 @@
 <% content_for :title, "今日の候補" %>
 
 <h2>今日の候補</h2>
-<p class="lead">
-  <code>wished</code> のうち、その日のシードでシャッフルした数件。並びは今日のうちは変わらず、明日には入れ替わる。
-</p>
+<p class="lead">「したい」のうちから数件。今日のうちは同じ並びで、明日には入れ替わる。</p>
 
 <p class="filters">
   <%= link_to "すべて", wishlist_path, class: ("on" if @kind.nil?) %>
@@ -12,14 +10,18 @@
   <% end %>
 </p>
 
-<ol class="timeline">
+<ol class="timeline wishlist">
   <% @suggestions.each do |row| %>
     <li class="event">
-      <%= cover_image(row.subject, "thumb") %>
-      <span class="kind kind-<%= row.kind %>"><%= kind_label(row.kind) %></span>
-      <%= link_to row.title, subject_path(row.id) %>
-      <% if row.creator.present? %><span class="creator"><%= row.creator %></span><% end %>
-      <span class="as-of"><%= wished_since(row.as_of) %></span>
+      <%= cover_thumb(row.subject) %>
+      <div class="body">
+        <p class="title"><%= link_to row.title, subject_path(row.id) %></p>
+        <p class="meta">
+          <span class="kind kind-<%= row.kind %>"><%= kind_label(row.kind) %></span>
+          <% if row.creator.present? %><span class="creator"><%= row.creator %></span><% end %>
+          <span class="as-of"><%= wished_since(row.as_of) %></span>
+        </p>
+      </div>
       <%= render "shared/transition_buttons", subject: row.subject, status: row.status %>
     </li>
   <% end %>
