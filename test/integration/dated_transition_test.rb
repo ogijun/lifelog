@@ -6,52 +6,54 @@ class DatedTransitionTest < ActionDispatch::IntegrationTest
     Event.create!(subject: @book, type: "wished", occurred_on: "2026-01")
   end
 
-  def record(**event) = post(subject_transition_path(@book), params: { event: { type: "did", occurred_on: "", **event } })
+  def press(type, occurred_on) = post(subject_transition_path(@book), params: { type:, event: { occurred_on: } })
 
-  test "詳細ページには、日付を指定して記録する画面へのリンクがある (フォームそのものは置かない)" do
+  test "状態のボタンと同じフォームに日付の欄があり、最初は「今日」が入っている" do
     get subject_path(@book)
-    assert_select ".state a[href=?]", new_subject_transition_path(@book), text: "日付や評価を指定して記録"
+
+    assert_select ".state form[action=?]", subject_transition_path(@book) do
+      assert_select "input[type=text][name='event[occurred_on]'][value='今日']"
+      assert_select "button[name=type][value=did]", "読んだ"
+      assert_select "button[name=type][value=dropped]", "やめた"
+    end
     assert_select "form.record", 0
   end
 
-  test "指定の画面は、次の状態が選ばれていて、今日の日付が入っている" do
-    travel_to Date.new(2026, 9, 25) do
-      get new_subject_transition_path(@book)
+  test "「今日」のまま押すと、押した日 (日本時間) で記録する" do
+    travel_to Time.utc(2026, 9, 24, 16, 0) do # 日本時間 9/25 1:00
+      press("did", "今日")
     end
-
-    assert_response :success
-    assert_select "h2", /細雪/
-    assert_select "fieldset.type-choice input[type=radio][value=did][checked]"
-    assert_select "input[name='event[occurred_on]'][value='2026/9/25']"
-    assert_select "select[name='event[rating]']"
-    assert_select "input[name='event[source_url]']"
-  end
-
-  test "曖昧な日付・評価・メモを指定して記録できる" do
-    record(occurred_on: "2019年", rating: "5", note: "学生のころ")
 
     assert_redirected_to @book
-    event = @book.events.find_by!(type: "did")
-    assert_equal [ "2019", 5, "学生のころ" ], event.attributes.values_at("occurred_on", "rating", "note")
+    assert_equal "2026-09-25", @book.events.find_by!(type: "did").occurred_on
   end
 
-  test "日付を空にすれば不明、時刻も書ける" do
-    record(occurred_on: "")
-    record(occurred_on: "2026/9/25 14:30")
-
-    assert_equal [ nil, "2026-09-25T14:30" ], @book.events.where(type: "did").order(:created_at).pluck(:occurred_on)
-  end
-
-  test "読めない日付は 422 で、書いたまま画面に戻る" do
-    assert_no_difference "Event.count" do
-      record(occurred_on: "あした")
+  test "日付を書き換えて同じボタンを押すと、その日付で記録する。空にすれば不明" do
+    travel_to Date.new(2026, 9, 25) do
+      press("did", "2019年")
+      press("did", "昨日 14:30")
+      press("did", "")
     end
-    assert_response :unprocessable_entity
-    assert_select ".errors", /のように書いてください/
-    assert_select "input[name='event[occurred_on]'][value='あした']"
+
+    assert_equal [ "2019", "2026-09-24T14:30", nil ].to_set, @book.events.where(type: "did").pluck(:occurred_on).to_set
   end
 
-  test "ボタンのほう (指定なし) は今までどおり今日で記録する" do
+  test "読めない日付は記録せず、エラーを出す" do
+    assert_no_difference "Event.count" do
+      press("did", "あした")
+    end
+    assert_redirected_to @book
+    follow_redirect!
+    assert_select ".alert", /のように書いてください/
+  end
+
+  test "今日の候補の行は、日付の欄なしのボタンだけ (今日で記録)" do
+    get wishlist_path
+    assert_select ".event form[action=?]", subject_transition_path(@book) do
+      assert_select "button[name=type][value=did]"
+      assert_select "input[name='event[occurred_on]']", 0
+    end
+
     travel_to Date.new(2026, 9, 25) do
       post subject_transition_path(@book), params: { type: "did" }
     end
