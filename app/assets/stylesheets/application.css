@@ -218,6 +218,9 @@ h2 .kind { display: block; margin-bottom: .2rem; color: var(--muted); font: 400 
   margin: 1rem 0 1.4rem;
 }
 .state .as-of { color: var(--muted); font-size: .85rem; }
+/* ボタンは今日で記録する。日付などを指定したいときだけこのリンクから */
+.state .dated { color: var(--muted); font-size: .8rem; }
+.state .dated:hover { color: var(--indigo); }
 
 /* 状態を次に進めるボタン (いまの状態の横、今日の候補の各行) */
 .transitions { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
