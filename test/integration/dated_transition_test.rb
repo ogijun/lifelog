@@ -6,17 +6,36 @@ class DatedTransitionTest < ActionDispatch::IntegrationTest
     Event.create!(subject: @book, type: "wished", occurred_on: "2026-01")
   end
 
-  def press(type, occurred_on) = post(subject_transition_path(@book), params: { type:, event: { occurred_on: } })
+  def press(type, occurred_on, **event) = post(subject_transition_path(@book), params: { type:, event: { occurred_on:, **event } })
 
-  test "状態のボタンと同じフォームに日付の欄があり、最初は「今日」が入っている" do
+  test "ふだんはボタンだけ。細かく入れる欄 (日付・評価・メモ) は閉じた開閉の中にある" do
     get subject_path(@book)
 
     assert_select ".state form[action=?]", subject_transition_path(@book) do
-      assert_select "input[type=text][name='event[occurred_on]'][value='今日']"
       assert_select "button[name=type][value=did]", "読んだ"
       assert_select "button[name=type][value=dropped]", "やめた"
+      assert_select "details:not([open]) summary", "日付や評価も入れる"
+      assert_select "details input[type=text][name='event[occurred_on]'][value='今日']"
+      assert_select "details select[name='event[rating]']"
+      assert_select "details textarea[name='event[note]']"
     end
     assert_select "form.record", 0
+  end
+
+  test "評価とメモも同じボタンで一緒に記録できる" do
+    press("did", "2019年", rating: "5", note: "学生のころ")
+
+    event = @book.events.find_by!(type: "did")
+    assert_equal [ "2019", 5, "学生のころ" ], event.attributes.values_at("occurred_on", "rating", "note")
+  end
+
+  test "閉じたまま押したとき (今日・評価なし・メモなし) は、今日で記録するだけ" do
+    travel_to Date.new(2026, 9, 25) do
+      press("did", "今日", rating: "", note: "")
+    end
+
+    event = @book.events.find_by!(type: "did")
+    assert_equal [ "2026-09-25", nil, nil ], event.attributes.values_at("occurred_on", "rating", "note")
   end
 
   test "「今日」のまま押すと、押した日 (日本時間) で記録する" do
