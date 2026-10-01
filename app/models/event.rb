@@ -9,7 +9,8 @@ class Event < ApplicationRecord
 
   TYPES = %w[wished did dropped].freeze
   # いまの状態から次に取れる状態。画面のボタンに出す。
-  NEXT_TYPES = { "wished" => %w[did dropped], "did" => %w[wished], "dropped" => %w[wished] }.freeze
+  # did のあとの did は再読・再訪 (did が複数並ぶだけで特別扱いしない)。
+  NEXT_TYPES = { "wished" => %w[did dropped], "did" => %w[wished did], "dropped" => %w[wished] }.freeze
   IMMUTABLE = %w[type].freeze
   # 登録ミスの取り消しを許す期間。過ぎたら追記のみに戻る。
   UNDO_WINDOW = 1.hour

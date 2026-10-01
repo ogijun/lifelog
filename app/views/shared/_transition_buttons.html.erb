@@ -2,6 +2,6 @@
 <span class="transitions">
   <% Event::NEXT_TYPES.fetch(status, []).each do |type| %>
     <%= button_to transition_label(type, subject.kind, from: status), subject_transition_path(subject),
-          params: { type: }, class: "transition", form: { data: { turbo_frame: "_top" } } %>
+          params: { type: }, class: "transition" %>
   <% end %>
 </span>
