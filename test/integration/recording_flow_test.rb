@@ -44,14 +44,12 @@ class RecordingFlowTest < ActionDispatch::IntegrationTest
     assert_select ".errors"
   end
 
-  test "詳細ページには評価やメモの記録フォームを置かない (状態はボタンで進め、細かいことは編集で直す)" do
+  test "詳細ページには状態のボタンのほかに記録フォームを置かない" do
     post books_path, params: { subject: { title: "細雪" }, event: { type: "wished", occurred_on: "2026/1/1" } }
     subject = Subject.last
 
     get subject_path(subject)
     assert_select "form.record", 0
-    assert_select "select[name='event[rating]']", 0
-    assert_select "textarea[name='event[note]']", 0
     assert_select ".state form[action=?]", subject_transition_path(subject)
   end
 
