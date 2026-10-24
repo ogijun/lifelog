@@ -47,6 +47,10 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # ローカルで https://lifelog.test を開くための入口 (puma-dev の置き換え)。
+  # Caddy の入口は dotfiles の portico.nix
+  gem "portico", github: "ogijun/portico"
 end
 
 group :test do
