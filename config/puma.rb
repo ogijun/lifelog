@@ -34,6 +34,10 @@ port ENV.fetch("PORT", 3000)
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 
+# development だけ: 空きポートで起動して https://lifelog.test に登録する (gem portico)。
+# 本番の bundle には portico が入らないので、この行は何もしない。
+plugin :portico if Gem.loaded_specs.key?("portico")
+
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
