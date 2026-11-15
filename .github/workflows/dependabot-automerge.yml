@@ -1,0 +1,55 @@
+name: Dependabot auto-merge
+
+# CI が緑になった Dependabot の minor/patch グループ PR だけを merge する。
+# PR のコードは checkout せず、secrets も使わない。
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'dependabot/') &&
+      contains(github.event.workflow_run.head_branch, 'minor-and-patch')
+    steps:
+      - name: Merge the PR if it is still the one CI checked
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No pull request attached to this run; nothing to do."
+            exit 0
+          fi
+
+          read -r state author head < <(gh pr view "$PR_NUMBER" \
+            --json state,author,headRefOid \
+            --jq '[.state, .author.login, .headRefOid] | @tsv')
+
+          if [ "$state" != "OPEN" ]; then
+            echo "PR #$PR_NUMBER is $state; skipping."
+            exit 0
+          fi
+          if [ "$author" != "app/dependabot" ] && [ "$author" != "dependabot[bot]" ]; then
+            echo "PR #$PR_NUMBER is authored by $author; skipping."
+            exit 0
+          fi
+          if [ "$head" != "$HEAD_SHA" ]; then
+            echo "PR #$PR_NUMBER head moved ($head != $HEAD_SHA); skipping."
+            exit 0
+          fi
+
+          # lifelog の main は直線の履歴なので rebase で入れる。
+          gh pr merge "$PR_NUMBER" --rebase --match-head-commit "$HEAD_SHA"
